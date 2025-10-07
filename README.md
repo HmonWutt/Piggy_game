@@ -6,7 +6,8 @@
 
 -Rebeccar Blixt
 -Dechain Dolkar
--Hmon Wutt
+
+- Hmon Wutt
 
 ## Table of Contents
 
