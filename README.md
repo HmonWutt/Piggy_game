@@ -1,8 +1,12 @@
-# Project Name
+# Pig game
 
-A brief description of what your project does.
+## One-dice pig game
 
----
+##Group members
+
+-Rebeccar Blixt
+-Dechain Dolkar
+-Hmon Wutt
 
 ## Table of Contents
 
