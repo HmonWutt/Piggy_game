@@ -20,10 +20,10 @@ Provide instructions on how to install your project.
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/project-name.git
+git clone https://github.com/HmonWutt/Piggy_game.git
 
 # Navigate to the project folder
-cd project-name
+cd piggy_game
 
 # Install dependencies (if any)
 pip install -r requirements.txt
