@@ -8,7 +8,7 @@
 
 - [x] Group of 2 (max 3) students formed
 - [x] Shared Git repository created (GitHub or GitLab) **Hmon**
-- [ ] Repo initialized with `.gitignore`, `README.md`, `LICENSE.md`, and `requirements.txt` **Hmon**
+- [x] Repo initialized with `.gitignore`, `README.md`, `LICENSE.md`, and `requirements.txt` **Hmon**
 
 ---
 
