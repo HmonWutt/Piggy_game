@@ -2,13 +2,6 @@
 
 ## One-dice pig game
 
-##Group members
-
--Rebeccar Blixt
--Dechain Dolkar
-
-- Hmon Wutt
-
 ## Table of Contents
 
 - [Installation](#installation)
@@ -33,3 +26,14 @@ cd piggy_game
 # Install dependencies (if any)
 pip install -r requirements.txt
 ```
+
+## Usage
+
+## Features
+
+## Contributing
+
+- Rebecca Blixt
+  -Dechain Dolkar
+
+- Hmon Wutt
