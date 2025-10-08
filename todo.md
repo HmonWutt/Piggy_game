@@ -23,6 +23,7 @@
 - [x] Identified main classes (e.g., Game, Player, Deck, Dice, HighScore, Intelligence, etc.)
 - [ ] Planned object-oriented structure (class diagram draft)
 - [ ] Defined core gameplay loop using Python’s `cmd` module **Hmon**
+- [ ] Discuss public methods of our classes
 
 ---
 
