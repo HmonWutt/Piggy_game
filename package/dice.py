@@ -1,4 +1,4 @@
-from dice_interface import Dice_interface
+from package.dice_interface import Dice_interface
 from random import randint
 
 class Dice(Dice_interface):
