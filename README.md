@@ -34,6 +34,7 @@ pip install -r requirements.txt
 ## Contributing
 
 - Rebecca Blixt
-  -Dechen Dolkar
+
+- Dechen Dolkar
 
 - Hmon Wutt
