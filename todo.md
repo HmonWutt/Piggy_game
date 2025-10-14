@@ -21,9 +21,9 @@
 - [x] Decided variation of the game to implement  
        _One-diced Pig_
 - [x] Identified main classes (e.g., Game, Player, Deck, Dice, HighScore, Intelligence, etc.)
-- [ ] Planned object-oriented structure (class diagram draft)
-- [ ] Defined core gameplay loop using Python’s `cmd` module **Hmon**
-- [ ] Discuss public methods of our classes
+- [x] Planned object-oriented structure (class diagram draft)
+- [x] Defined core gameplay loop using Python’s `cmd` module **Hmon**
+- [x] Discuss public methods of our classes
 
 ---
 
@@ -48,20 +48,20 @@
 
 ## 🧱 Code Structure & Best Practices
 
-- [ ] Each class in its own file
-- [ ] Object-oriented design used
-- [ ] Small, clear methods
+- [x] Each class in its own file
+- [x] Object-oriented design used
+- [x] Small, clear methods
 - [ ] Follows **PEP 20 (The Zen of Python)**
 - [ ] Follows **PEP 8 style guide**
 - [ ] Functional programming used where appropriate
 - [ ] > 50 commits and ~10 tags in Git (guideline)
-- [ ] `Makefile` created (optional but recommended) **Dechen**
-  - [ ] `make run` – run the game
-  - [ ] `make test` – run tests
-  - [ ] `make coverage` – generate coverage report
-  - [ ] `make lint` – run linters
-  - [ ] `make doc` – generate documentation
-  - [ ] `make uml` – generate UML diagrams
+- [x] `Makefile` created (optional but recommended) **Dechen**
+  - [x] `make run` – run the game
+  - [x] `make test` – run tests
+  - [x] `make coverage` – generate coverage report
+  - [x] `make lint` – run linters
+  - [x] `make doc` – generate documentation
+  - [x] `make uml` – generate UML diagrams
 
 ---
 
