@@ -10,7 +10,7 @@ class Player:
         # self.highscore = highscore()
 
     # rename player
-    def change_name(self):
-        self.player_name = input("Enter your new name: ")
+    def change_name(self, new_name: str):
+        self.player_name = new_name
 
 # 
