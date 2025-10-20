@@ -1,5 +1,6 @@
-from package.dice_interface import Dice_interface
+from .dice_interface import Dice_interface
 from random import randint
+
 
 class Dice(Dice_interface):
     def __init__(self):
@@ -10,9 +11,8 @@ class Dice(Dice_interface):
         return self._face
 
     @face.setter
-    def face(self,value):
+    def face(self, value):
         self._face = value
 
     def roll(self):
-        self._face = randint(1,7)
-
+        self._face = randint(1, 7)
