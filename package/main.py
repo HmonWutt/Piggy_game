@@ -1,6 +1,8 @@
 import cmd
-from game import Game
-from dice import Dice
+from .game import Game
+from .dice import Dice
+from .highscore import HighScore
+
 # game = Game()
 # game.cmdloop()
 dice = Dice()

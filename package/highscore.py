@@ -1,12 +1,11 @@
 import json
 import os
-from highscore_interface import HighScoreInterface
+from .highscore_interface import HighScoreInterface
 
 
 class HighScore(HighScoreInterface):
-
     # initializing HighScore with json file path
-    def _init_(self, filepath="data/highscores.json"):
+    def __init__(self, filepath="data/highscores.json"):
         self.filepath = filepath
         self.data = {"Players": {}}
         self.load_data()
@@ -28,8 +27,11 @@ class HighScore(HighScoreInterface):
     # adds a new player if it doesnt already exist in the json file
     def add_player(self, name: str):
         if name not in self.data["Players"]:
-            self.data["Players"][name] = {"games_played": 0, "wins": 0,
-                                          "highest_score": 0}
+            self.data["Players"][name] = {
+                "games_played": 0,
+                "wins": 0,
+                "highest_score": 0,
+            }
             self.save_data()
 
     # updates player stats after a game
