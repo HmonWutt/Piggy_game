@@ -5,7 +5,7 @@ from .highscore_interface import HighScoreInterface
 
 class HighScore(HighScoreInterface):
     # initializing HighScore with json file path
-    def __init_(self, filepath="data/highscores.json"):
+    def __init__(self, filepath="data/highscores.json"):
         self.filepath = filepath
         self.data = {"Players": {}}
         self.load_data()
@@ -52,3 +52,6 @@ class HighScore(HighScoreInterface):
     # returns stats for all players
     def get_all_players(self) -> dict:
         return self.data["Players"]
+
+
+score = HighScore()
