@@ -71,6 +71,20 @@ class TestHighscore(unittest.TestCase):
             f"Expected {self.highscore.data['Players']}, got {result}",
         )
 
+    @print_test_result
+    def test_add_player(self):
+        dict = {
+            "Players": {
+                "John": {
+                    "games_played": 0,
+                    "wins": 0,
+                    "highest_score": 0,
+                }
+            }
+        }
+        self.highscore.add_player("John")
+        self.assertEqual(self.highscore.data, dict)
+
     def tearDown(self):
         if os.path.isdir(os.path.dirname(self.file_path)):
             shutil.rmtree(os.path.dirname(self.file_path))
