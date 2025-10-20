@@ -99,6 +99,20 @@ class TestHighscore(unittest.TestCase):
         self.highscore.record_game("Julie", 20, True)
         self.assertEqual(self.highscore.data, old_record)
 
+    @print_test_result
+    def test_record_game_loss(self):
+        old_record = {
+            "Players": {
+                "Jenny": {
+                    "games_played": 1,
+                    "wins": 0,
+                    "highest_score": 40,
+                }
+            }
+        }
+        self.highscore.record_game("Jenny", 40, False)
+        self.assertEqual(self.highscore.data, old_record)
+
     def tearDown(self):
         if os.path.isdir(os.path.dirname(self.file_path)):
             shutil.rmtree(os.path.dirname(self.file_path))
