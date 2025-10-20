@@ -52,6 +52,3 @@ class HighScore(HighScoreInterface):
     # returns stats for all players
     def get_all_players(self) -> dict:
         return self.data["Players"]
-
-
-score = HighScore()
