@@ -1,5 +1,5 @@
 import pytest
-from piggy_game.package.player import Player
+from package.player import Player
 
 
 class TestPlayer:
