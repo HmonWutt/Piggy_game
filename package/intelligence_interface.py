@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class Inteligence(ABC):
+class Intelligence(ABC):
     
     @abstractmethod
     def decide(self, turn_score: int, total_score: int, opponent_score: int) -> str:

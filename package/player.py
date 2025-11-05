@@ -12,8 +12,8 @@ class Player:
         self.score = 0
 
     # rename player
-    def change_name(self):
-        self.player_name = input("Enter your new name: ")
+    def change_name(self, new_name: str):
+        self.player_name = new_name
 
     def set_score(self, score):
         self.score = score

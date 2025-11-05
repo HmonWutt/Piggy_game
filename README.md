@@ -29,11 +29,13 @@ pip install -r requirements.txt
 
 ## Usage
 
+
 ## Features
 
 ## Contributing
 
 - Rebecca Blixt
-  -Dechen Dolkar
+
+- Dechen Dolkar
 
 - Hmon Wutt
