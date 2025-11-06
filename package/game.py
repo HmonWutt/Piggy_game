@@ -24,19 +24,22 @@ class Game(cmd.Cmd):
     - Race to 100 points to win
     - Roll dice to accumulate points in your turn
     - If you roll a 1 (in one dice game) and roll double 1s (in two-dice game), you lose all turn points and your turn ends
-    - Type 'hold' to bank your turn points and pass to next player
-    - Type 'pause' to pause the game
-    - Type 'resume' to pick up the game from where you left off
-    - Type 'help' for all commands
-    
+          
     Choose your game mode:
-    - To play with a \033[1m robot \033[1m , Type 'startR --dice {1,2} --n {name} --intel {l,m,h}'.
+    - To play with a \033[1mrobot\033[0m, Type 'startR --dice {1,2} --n {name} --intel {l,m,h}'.
       The robot has three intelligence levels: l:low, m: medium, h: high.
-    - To play with another \033[1m human \033[1m , Type 'startH --n1 {name1} --n2 {name2} --dice {1,2}'
+    - To play with another \033[1mhuman\033[0m, Type 'startH --n1 {name1} --n2 {name2} --dice {1,2}'
  
     Actions: 
-    -Type 'roll' to roll 
-    -Type 'hold' to pass dice to the next player
+    - Type 'help' for all commands
+    - Type 'roll' to roll 
+    - Type 'hold' to pass dice to the next player
+    - Type 'cheat' to win the round
+    - Type 'surrender' to lose and end the round
+    - Type 'pause' to pause the game
+    - Type 'resume' to resume the game
+    - Type 'exit' to exit the game
+    - Type 'show' to see players' statistics [COMING]
 
    """
 
@@ -49,6 +52,7 @@ class Game(cmd.Cmd):
         self.player_two = None
         self.dice = Dice()
         self.score_board = Score_board()
+        self.is_round_over = False
         self.is_paused = False
         self.number_of_dice = 0
         self.current_player = None
@@ -146,12 +150,14 @@ class Game(cmd.Cmd):
         """Robot auto_play and pass back to human"""
         if self.is_opponent_robot:
             self.auto_play()
-            self.pass_to_human()
-            Game.prompt = self.current_player.player_name + "$ "
+            if not self.is_round_over:
+                self.pass_to_human()
+                Game.prompt = self.current_player.player_name + "$ "
 
         else:
             self.switch_current_player()
             self.print_whose_turn_it_is_now(self.current_player)
+            self.decide_winner()
 
     def print_whose_turn_it_is_now(self, player):
         print(f"\nIt's {player.player_name}'s turn. Points: {player.get_score()}")
@@ -173,7 +179,7 @@ class Game(cmd.Cmd):
             self.print_whose_turn_it_is_now(self.player_two)
             action = "roll"
             points = self.player_two.get_score()
-            while action == "roll":
+            while action == "roll" and not self.is_round_over:
                 for _ in range(self.number_of_dice):
                     turn_score = self.dice.roll()
                     points += turn_score
@@ -182,9 +188,12 @@ class Game(cmd.Cmd):
                     action = self.intelligence.decide(
                         self.player_two.get_score(), turn_score, 0
                     )
-                    if action == "hold":
+                    self.decide_winner()
+                    if action == "hold" or self.is_round_over:
                         break
+
             print(f"Robots total points: {self.player_two.get_score()}")
+            self.decide_winner()
 
     def display_score_board(self):
         """Display score board"""
@@ -193,9 +202,44 @@ class Game(cmd.Cmd):
     ╔═══════════════════════════════════════╗
     ║           Game statistics!            ║
     ╚═══════════════════════════════════════╝
-    
-"""
+
+    """
         Utils.print_dict_table(info, banner)
+
+    def decide_winner(self):
+        if not self.is_round_over:
+            one_player_reached_100 = (
+                self.player_one.get_score() >= 100 or self.player_two.get_score() >= 100
+            )
+            one_player_rolled_one = (
+                self.player_one.get_score() == 1 or self.player_two.get_score() == 1
+            )
+            self.is_round_over = one_player_reached_100 or one_player_rolled_one
+        else:
+            print("Round over. Type 'again' to play another game")
+            self.display_score_board()
+            Game.prompt = "piggygame$ "
+
+    def do_again(self, arg):
+        """Reset players scores"""
+        self.player_two.set_score(0)
+        self.player_one.set_score(0)
+        self.is_round_over = False
+        self.current_player = self.player_one
+        self.print_whose_turn_it_is_now(self.current_player)
+        Game.prompt = f"{self.current_player.player_name}$ "
+
+    def do_cheat(self, arg):
+        """Cheat to win"""
+        self.player_one.set_score(100)
+        self.is_round_over = True
+        self.decide_winner()
+
+    def do_surrender(self, arg):
+        """Surrender and end this round"""
+        self.player_one.set_score(1)
+        self.is_round_over = True
+        self.decide_winner()
 
     def do_pause(self, arg):
         """Save game data to file and pause the game"""
