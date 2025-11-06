@@ -3,11 +3,15 @@ import argparse
 from os import wait
 import shlex
 
-from package import intelligence
 
 from .dice import Dice
 from .player import Player
 from .highscore import HighScore
+from .intelligence_easy import Easy as Low
+from .intelligence_medium import Medium
+from .intelligence_hard import Hard as High
+from .highscore import HighScore as Score_board
+from utils import Utils
 
 
 class Game(cmd.Cmd):
@@ -43,17 +47,16 @@ class Game(cmd.Cmd):
         self.player_one = None
         self.player_two = None
         self.dice = Dice()
-        self.score_board = HighScore()
+        self.score_board = Score_board()
         self.is_paused = False
         self.number_of_dice = 0
         self.current_player = None
         self.intelligence = ""
         self.is_opponent_robot = False
-        # low = Low()
-        # medium = Medium()
-        # high = High()
-        # self.intelligence_levels = {l: low,m:medium,h:high]
-        self.intelligence_levels = ["low", "medium", "high"]
+        low = Low()
+        medium = Medium()
+        high = High()
+        self.intelligence_levels = {"l": low, "m": medium, "h": high}
 
     def do_startR(self, arg):
         """Player starts a new game against robot with args."""
@@ -71,7 +74,7 @@ class Game(cmd.Cmd):
             self.player_one = Player(args.name)
             self.player_two = Player("Robot 🤖")
             self.number_of_dice = args.dice
-            self.intelligence = args.intel
+            self.intelligence = self.intelligence_levels[args.intel]
             self.start_game()
         except SystemExit as e:
             """User typed help"""
@@ -102,33 +105,45 @@ class Game(cmd.Cmd):
     def start_game(self):
         print("Game started")
         self.is_paused = False
+        """Player one will be the first to play"""
         self.current_player = self.player_one
-        print(
-            f"It's {self.current_player.player_name}'s turn. Points: {self.current_player.get_score()}"
-        )
+        """Add players to the score board"""
+        self.score_board.add_player(self.player_one.player_name)
+        self.score_board.add_player(self.player_two.player_name)
+        self.display_score_board()
 
     def do_roll(self, arg):
         points = 0
         current_points = self.current_player.get_score()
+        """currently rolls both dices in a row. Will edit later to allow the user to roll one by one"""
         for i in range(self.number_of_dice):
-            self.dice.roll()
-            points += self.dice.face
+            face = self.dice.roll()
+            points += face
         current_points += points
         self.current_player.set_score(current_points)
         updated_points = self.current_player.get_score()
         print(f"{self.current_player.player_name}'s points: {updated_points}")
         self.show_turn()
 
+    def do_hold(self, arg):
+        """Turn ends and pass to opponent"""
+        self.show_turn()
+
+    def save_game(self, name, score, is_winner):
+        """Save points before passing to opponent"""
+        self.score_board.record_game(name, score, is_winner)
+
     def show_turn(self):
-        """show whose turn it is and the cumulated points"""
+        """Robot auto_play and pass back to human"""
         if self.is_opponent_robot:
-            print(
-                f"It's {self.player_two.player_name}'s turn. Points: {self.player_two.get_score()}"
-            )
             self.auto_play()
             self.pass_to_human()
         else:
             self.switch_current_player()
+            self.print_whose_turn_it_is_now(self.current_player)
+
+    def print_whose_turn_it_is_now(self, player):
+        print(f"It's {player.player_name}'s turn. Points: {player.get_score()}")
 
     def switch_current_player(self):
         if self.player_one is not self.current_player:
@@ -136,23 +151,46 @@ class Game(cmd.Cmd):
         else:
             self.current_player = self.player_two
 
-        print(
-            f"It's {self.current_player.player_name}'s turn. Points: {self.current_player.get_score()}"
-        )
-
     def pass_to_human(self):
-        print(
-            f"It's {self.current_player.player_name}'s turn. Points: {self.current_player.get_score()}"
-        )
+        """Do nothing just print that it's human's turn now"""
+        self.print_whose_turn_it_is_now(self.player_one)
 
     def auto_play(self):
-        """to implement with intelligence class later"""
-        print(f"Played with {self.intelligence} intelligence and earned 3 points")
+        self.print_whose_turn_it_is_now(self.player_two)
+        action = "roll"
+        points = self.player_two.get_score()
+        while action == "roll":
+            for _ in range(self.number_of_dice):
+                turn_score = self.dice.roll()
+                points += turn_score
+                self.player_two.set_score(points)
+                """opponent's score is set to 0 for now as it is not used"""
+                action = self.intelligence.decide(
+                    self.player_two.get_score(), turn_score, 0
+                )
+                if action == "hold":
+                    break
+        print(f"Robots total points: {self.player_two.get_score()}")
+
+    def display_score_board(self):
+        """Display score board"""
+        info = self.score_board.get_all_players()
+        Utils.print_dict_table(info)
+
+    def do_pause(self, arg):
+        """Save game data to file and pause the game"""
+        self.save_game()
+        print("Game paused. Type 'resume' to resume game")
+        self.display_score_board()
 
     def do_explain(self, arg):
         """Explain the rules of the game."""
         just_the_rules = Game.intro.splitlines()[4:14]
         print("\n".join(just_the_rules))
+
+    def do_resume(self, arg):
+        """Resuming game"""
+        self.display_score_board()
 
     def do_exit(self, arg):
         """Exit the game"""

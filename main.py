@@ -1,4 +1,4 @@
-from package import Game, Dice, HighScore
+from package import Game
 
 game = Game()
 game.cmdloop()

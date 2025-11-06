@@ -16,3 +16,4 @@ class Dice(Dice_interface):
 
     def roll(self):
         self._face = randint(1, 7)
+        return self.face
