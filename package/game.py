@@ -37,6 +37,7 @@ class Game(cmd.Cmd):
     Actions: 
     -Type 'roll' to roll 
     -Type 'hold' to pass dice to the next player
+
    """
 
     prompt = "piggame$ "
@@ -79,7 +80,7 @@ class Game(cmd.Cmd):
         except SystemExit as e:
             """User typed help"""
             if e.code != 0:
-                print("Type 'startR --dice {1,2} --n {name} --intel {l,m,h}'")
+                print("Type 'startR --dice {1,2} --n {name} --intel {l,m,h}'\n")
             return
 
     def do_startH(self, arg):
@@ -99,7 +100,7 @@ class Game(cmd.Cmd):
             self.start_game()
         except SystemExit as e:
             if e.code != 0:
-                print("Type 'startH --n1 {name1} --n2 {name2} --dice {1,2}'")
+                print("Type 'startH --n1 {name1} --n2 {name2} --dice {1,2}'\n")
             return
 
     def start_game(self):
@@ -111,23 +112,31 @@ class Game(cmd.Cmd):
         self.score_board.add_player(self.player_one.player_name)
         self.score_board.add_player(self.player_two.player_name)
         self.display_score_board()
+        self.print_whose_turn_it_is_now(self.current_player)
+        Game.prompt = self.current_player.player_name + "$ "
 
     def do_roll(self, arg):
-        points = 0
-        current_points = self.current_player.get_score()
-        """currently rolls both dices in a row. Will edit later to allow the user to roll one by one"""
-        for i in range(self.number_of_dice):
-            face = self.dice.roll()
-            points += face
-        current_points += points
-        self.current_player.set_score(current_points)
-        updated_points = self.current_player.get_score()
-        print(f"{self.current_player.player_name}'s points: {updated_points}")
-        self.show_turn()
+        if not self.is_paused:
+            points = 0
+            current_points = self.current_player.get_score()
+            """currently rolls both dices in a row. Will edit later to allow the user to roll one by one"""
+            for i in range(self.number_of_dice):
+                face = self.dice.roll()
+                points += face
+            current_points += points
+            self.current_player.set_score(current_points)
+            updated_points = self.current_player.get_score()
+            print(f"{self.current_player.player_name}'s points: {updated_points}")
+            self.show_turn()
+        else:
+            print("game paused. type resume to continue playing\n")
 
     def do_hold(self, arg):
-        """Turn ends and pass to opponent"""
-        self.show_turn()
+        if not self.is_paused:
+            """Turn ends and pass to opponent"""
+            self.show_turn()
+        else:
+            print("game paused. type resume to continue playing\n")
 
     def save_game(self, name, score, is_winner):
         """Save points before passing to opponent"""
@@ -138,50 +147,62 @@ class Game(cmd.Cmd):
         if self.is_opponent_robot:
             self.auto_play()
             self.pass_to_human()
+            Game.prompt = self.current_player.player_name + "$ "
+
         else:
             self.switch_current_player()
             self.print_whose_turn_it_is_now(self.current_player)
 
     def print_whose_turn_it_is_now(self, player):
-        print(f"It's {player.player_name}'s turn. Points: {player.get_score()}")
+        print(f"\nIt's {player.player_name}'s turn. Points: {player.get_score()}")
 
     def switch_current_player(self):
         if self.player_one is not self.current_player:
             self.current_player = self.player_one
         else:
             self.current_player = self.player_two
+        Game.prompt = self.current_player.player_name + "$ "
 
     def pass_to_human(self):
         """Do nothing just print that it's human's turn now"""
+        prompt = self.player_one.player_name + ": "
         self.print_whose_turn_it_is_now(self.player_one)
 
     def auto_play(self):
-        self.print_whose_turn_it_is_now(self.player_two)
-        action = "roll"
-        points = self.player_two.get_score()
-        while action == "roll":
-            for _ in range(self.number_of_dice):
-                turn_score = self.dice.roll()
-                points += turn_score
-                self.player_two.set_score(points)
-                """opponent's score is set to 0 for now as it is not used"""
-                action = self.intelligence.decide(
-                    self.player_two.get_score(), turn_score, 0
-                )
-                if action == "hold":
-                    break
-        print(f"Robots total points: {self.player_two.get_score()}")
+        if not self.is_paused:
+            self.print_whose_turn_it_is_now(self.player_two)
+            action = "roll"
+            points = self.player_two.get_score()
+            while action == "roll":
+                for _ in range(self.number_of_dice):
+                    turn_score = self.dice.roll()
+                    points += turn_score
+                    self.player_two.set_score(points)
+                    """opponent's score is set to 0 for now as it is not used"""
+                    action = self.intelligence.decide(
+                        self.player_two.get_score(), turn_score, 0
+                    )
+                    if action == "hold":
+                        break
+            print(f"Robots total points: {self.player_two.get_score()}")
 
     def display_score_board(self):
         """Display score board"""
         info = self.score_board.get_all_players()
-        Utils.print_dict_table(info)
+        banner = """
+    ╔═══════════════════════════════════════╗
+    ║           Game statistics!            ║
+    ╚═══════════════════════════════════════╝
+    
+"""
+        Utils.print_dict_table(info, banner)
 
     def do_pause(self, arg):
         """Save game data to file and pause the game"""
-        self.save_game()
-        print("Game paused. Type 'resume' to resume game")
-        self.display_score_board()
+        # self.save_game()
+        self.is_paused = True
+        print("Game paused. Type 'resume' to resume game\n")
+        Game.prompt = "piggygame$ "
 
     def do_explain(self, arg):
         """Explain the rules of the game."""
@@ -190,7 +211,10 @@ class Game(cmd.Cmd):
 
     def do_resume(self, arg):
         """Resuming game"""
+        self.is_paused = False
         self.display_score_board()
+        self.print_whose_turn_it_is_now(self.current_player)
+        Game.prompt = self.current_player.player_name + "$ "
 
     def do_exit(self, arg):
         """Exit the game"""

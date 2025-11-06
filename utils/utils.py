@@ -16,7 +16,6 @@ class Utils:
     def print_dict_table(data, title="My Table"):
         """Print title"""
         print(f"\n{title}")
-        print("=" * len(title))
 
         """Calculate column width"""
         key_width = max(len(str(k)) for k in data.keys())
@@ -28,4 +27,4 @@ class Utils:
 
         """print data"""
         for key, value in data.items():
-            print(f"{str(key).ljust(key_width)} | {str(value).ljust(val_width)}")
+            print(f"{str(key).ljust(key_width)} | {str(value).ljust(val_width)}\n")
