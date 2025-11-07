@@ -31,12 +31,12 @@
 
 - [x] 1-player mode (vs computer) implemented
 - [x] 2-player mode implemented
-- [ ] Player can select and change their name
+- [x] Player can select and change their name
 - [ ] Persistent high-score system (saves across sessions)---to clarify about saving record_game method
 - [ ] High scores persist even if player name changes
 - [x] Rules of the game viewable
 - [x] Full game round playable
-- [ ] Restart and quit options available
+- [x] Restart and quit options available
 - [x] Cheat function for testing implemented
 - [x] Text-based visuals added (ASCII/UTF-8)
 - [x] Computer AI implemented
