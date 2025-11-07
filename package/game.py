@@ -1,6 +1,9 @@
 import cmd
 import argparse
+from os import wait
 import shlex
+from InquirerPy import inquirer
+import os
 
 
 from .dice import Dice
@@ -24,11 +27,6 @@ class Game(cmd.Cmd):
     - Roll dice to accumulate points in your turn
     - If you roll a 1 (in one dice game) and roll double 1s (in two-dice game), you lose all turn points and your turn ends
           
-    Choose your game mode:
-    - To play with a \033[1mrobot\033[0m, Type 'startR --dice {1,2} --n {name} --intel {l,m,h}'.
-      The robot has three intelligence levels: l:low, m: medium, h: high.
-    - To play with another \033[1mhuman\033[0m, Type 'startH --n1 {name1} --n2 {name2} --dice {1,2}'
- 
     Actions: 
     - Type 'help' for all commands
     - Type 'roll' to roll 
@@ -41,79 +39,94 @@ class Game(cmd.Cmd):
 
    """
 
-    prompt = "piggame$ "
+    prompt = "piggame> "
 
     def __init__(self):
         super().__init__()
         self.parser = argparse.ArgumentParser(prog="start")
+        self.filepath = "data/game.json"
         self.player_one = None
         self.player_two = None
+        self.is_opponent_robot = False
+        self.current_player = self.player_one
         self.dice = Dice()
         self.score_board = Score_board()
         self.is_round_over = False
-        self.is_paused = False
         self.number_of_dice = 0
-        self.current_player = None
-        self.intelligence = ""
-        self.is_opponent_robot = False
         self.intelligence_levels = {"l": Low(), "m": Medium(), "h": High()}
+        self.intelligence = None
 
-    def do_startR(self, arg):
-        """Player starts a new game against robot with args."""
-        self.is_opponent_robot = True
-        self.parser.add_argument("--dice", type=int, choices=[1, 2], default=1)
-        self.parser.add_argument("--name", type=str, default="Player_one")
+    def preloop(self):
+        """Take input before the main command loop starts"""
+        action = inquirer.select(
+            message="Resume saved game or start a new game?",
+            choices=["1: Resume", "2: Start a new game"],
+        ).execute()
+        if action.startswith("1"):
+            data = load_data()
+            self.player_one = Player(data.player_one_name)
+            self.player_two.player_name = Player(data.player_two_name)
+            self.player_one.set_score(data.player_one.points)
+            self.player_two.set_score(data.player_two.points)
+            self.current_player = data.current_player
+            self.is_opponent_robot = data.is_opponent_robot
+            self.is_round_over = data.is_round_over
+            self.is_paused = data.is_paused
+            self.number_of_dice = data.number_of_dice
+            self.intelligence = data.intelligence
+            self.display_score_board()
 
-        self.parser.add_argument(
-            "--intel", type=str, choices=["l", "m", "h"], default="l"
-        )
-        """Parse arguments."""
-        try:
-            args = self.parser.parse_args(shlex.split(arg))
-            """Instantiate one human and one robot player."""
-            self.player_one = Player(args.name)
-            self.player_two = Player("Robot 🤖")
-            self.number_of_dice = args.dice
-            self.intelligence = self.intelligence_levels[args.intel]
-            print(f"Intelligence level chosen: {type(self.intelligence).__name__}")
+            Game.intro = """
+    ╔═══════════════════════════════════════╗
+    ║             Welcome back!             ║
+    ╚═══════════════════════════════════════╝
+    
+                """
+
+            Game.prompt = self.current_player.player_name + "> "
+        else:
+            num_of_dice = inquirer.select(
+                message="How many dice?", choices=["1", "2"]
+            ).execute()
+            if num_of_dice.startswith("1"):
+                self.number_of_dice = 1
+            else:
+                self.number_of_dice = 2
+
+            action = inquirer.select(
+                message="Play with?", choices=["🦾 a robot", "💪 a human"]
+            ).execute()
+            if action.startswith("🦾"):
+                name = input("Enter your name: ")
+                self.player_one = Player(name)
+                self.player_two = Player("Robot")
+                self.is_opponent_robot = True
+
+                intel = inquirer.select(
+                    message="How smart do you want your robot friend to be?",
+                    choices=["Low", "Medium", "High"],
+                ).execute()
+                if intel.startswith("L"):
+                    self.intelligence = self.intelligence_levels["l"]
+                elif intel.startswith("M"):
+                    self.intelligence = self.intelligence_levels["m"]
+                else:
+                    self.intelligence = self.intelligence_levels["h"]
+            else:
+                name1 = input("Enter player one name: ")
+                name2 = input("Enter player two name: ")
+                self.player_one = Player(name1)
+                self.player_two = Player(name2)
+            self.current_player = self.player_one
             self.start_game()
-        except SystemExit as e:
-            """User typed help"""
-            if e.code != 0:
-                print("Type 'startR --dice {1,2} --n {name} --intel {l,m,h}'\n")
-            return
-
-    def do_startH(self, arg):
-        """Player starts a new game against another human"""
-
-        self.parser.add_argument("--dice", type=int, choices=[1, 2], default=1)
-        self.parser.add_argument("--n1", type=str, default="Player_one")
-        self.parser.add_argument("--n2", type=str, default="Player_two")
-        try:
-            args = self.parser.parse_args(shlex.split(arg))
-            self.number_of_dice = args.dice
-            name1 = args.n1
-            name2 = args.n2
-            """Instantiate two human players"""
-            self.player_one = Player(name1)
-            self.player_two = Player(name2)
-            self.start_game()
-        except SystemExit as e:
-            if e.code != 0:
-                print("Type 'startH --n1 {name1} --n2 {name2} --dice {1,2}'\n")
-            return
 
     def start_game(self):
         print("Game started")
         self.is_paused = False
-        """Player one will be the first to play"""
-        self.current_player = self.player_one
         """Add players to the score board"""
-        self.score_board.add_player(self.player_one.player_name)
-        self.score_board.add_player(self.player_two.player_name)
-        self.display_score_board()
-        self.print_whose_turn_it_is_now(self.current_player)
-        Game.prompt = self.current_player.player_name + "$ "
+        # self.score_board.add_player(self.player_one.player_name)
+        # self.score_board.add_player(self.player_two.player_name)
+        Game.prompt = self.current_player.player_name + "> "
 
     def do_roll(self, arg):
         """Roll the dice"""
@@ -176,11 +189,11 @@ class Game(cmd.Cmd):
             self.current_player = self.player_one
         else:
             self.current_player = self.player_two
-        Game.prompt = self.current_player.player_name + "$ "
+        Game.prompt = self.current_player.player_name + "> "
 
     def pass_to_human(self):
         """Do nothing just print that it's human's turn now"""
-        Game.prompt = self.player_one.player_name + ": "
+        Game.prompt = self.player_one.player_name + "> "
         self.print_whose_turn_it_is_now(self.player_one)
 
     def auto_play(self):
@@ -215,7 +228,7 @@ class Game(cmd.Cmd):
             if not self.is_round_over:
                 print(f"Robots total points: {self.player_two.get_score()}")
                 self.pass_to_human()
-                Game.prompt = self.current_player.player_name + "$ "
+                Game.prompt = self.current_player.player_name + "> "
             else:
                 self.announe_winner(self.player_two)
 
@@ -266,7 +279,7 @@ class Game(cmd.Cmd):
 
     def announce_round_end(self):
         print("Round over. Type 'again' to play another game")
-        Game.prompt = "piggygame$ "
+        Game.prompt = "piggygame> "
 
     def do_again(self, arg):
         """Play a new game"""
@@ -276,7 +289,7 @@ class Game(cmd.Cmd):
                 self.current_player = self.player_one
                 self.display_score_board()
                 self.print_whose_turn_it_is_now(self.current_player)
-                Game.prompt = f"{self.current_player.player_name}$ "
+                Game.prompt = f"{self.current_player.player_name}> "
             else:
                 print("Can't start a new game while current game is in progress")
 
@@ -286,8 +299,8 @@ class Game(cmd.Cmd):
     def do_cheat(self, arg):
         """Cheat to win"""
         if not self.is_paused:
-            self.player_one.set_score(100)
-            self.announe_winner(self.player_one)
+            self.current_player.set_score(100)
+            self.announe_winner(self.current_player)
             self.check_if_round_end()
         else:
             print("game paused. type resume to continue playing\n")
@@ -297,7 +310,7 @@ class Game(cmd.Cmd):
         # self.save_game()
         self.is_paused = True
         print("Game paused. Type 'resume' to resume game\n")
-        Game.prompt = "piggygame$ "
+        Game.prompt = "piggygame> "
 
     def do_explain(self, arg):
         """Explain the rules of the game."""
@@ -309,9 +322,54 @@ class Game(cmd.Cmd):
         self.is_paused = False
         self.display_score_board()
         self.print_whose_turn_it_is_now(self.current_player)
-        Game.prompt = self.current_player.player_name + "$ "
+        Game.prompt = self.current_player.player_name + "> "
+
+    def do_namechange(self, arg):
+        """Change your username"""
+        if self.is_opponent_robot:
+            new_name = input("Enter your new name: ")
+            self.current_player.player_name = new_name
+        else:
+            choice = inquirer.select(
+                message="Change name",
+                choices=[
+                    f"✔️ Yes. Change {self.current_player.player_name}: ",
+                    "❌No. Go back",
+                ],
+            ).execute()
+
+            if choice.startswith("✔️"):
+                new_name = inquirer.text(message="Enter new name: ").execute()
+                self.current_player.player_name = new_name
+                Game.prompt = self.current_player.player_name + "> "
+                print(
+                    f"\nYou have changed your name to {self.current_player.player_name}.\n"
+                )
+
+            elif choice.startswith("❌"):
+                print("\nGoing back to the game now!\n")
+
+    def save_game(self):
+        os.makedirs(os.path.dirname(self.filepath), exist_ok=True)
+        data = {
+            "name1": self.player_one.player_name,
+            "name2": self.player_two.player_name,
+            "points1": self.player_one.get_score(),
+            "points2": self.player_two.get_score(),
+        }
+        with open(self.filepath, "w") as f:
+            json.dump(data, f, indent=4)
 
     def do_exit(self, arg):
         """Exit the game"""
-        print("Exiting the game now..")
+        choice = inquirer.select(
+            message="Save the game to resume later?",
+            choices=["✔️ Yes", "❌No"],
+        ).execute()
+        if choice.startswith("✔️"):
+            """to implement saving game later"""
+            self.save_game()
+            print("game saved. Type 'restart' to restart this game")
+        else:
+            print("Exit without saving")
         return True

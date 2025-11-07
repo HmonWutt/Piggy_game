@@ -29,19 +29,19 @@
 
 ## ⚙️ Functional Requirements
 
-- [ ] 1-player mode (vs computer) implemented
-- [ ] 2-player mode implemented
+- [x] 1-player mode (vs computer) implemented
+- [x] 2-player mode implemented
 - [ ] Player can select and change their name
-- [ ] Persistent high-score system (saves across sessions)
+- [ ] Persistent high-score system (saves across sessions)---to clarify about saving record_game method
 - [ ] High scores persist even if player name changes
-- [ ] Rules of the game viewable
-- [ ] Full game round playable
+- [x] Rules of the game viewable
+- [x] Full game round playable
 - [ ] Restart and quit options available
-- [ ] Cheat function for testing implemented
-- [ ] Text-based visuals added (ASCII/UTF-8)
-- [ ] Computer AI implemented
-- [ ] Configurable AI difficulty levels
-- [ ] Handles invalid input gracefully
+- [x] Cheat function for testing implemented
+- [x] Text-based visuals added (ASCII/UTF-8)
+- [x] Computer AI implemented
+- [ ] Configurable AI difficulty levels---to clarify if dice are rolled one by one or two at once
+- [x] Handles invalid input gracefully
 - [ ] README includes description of how AI/intelligence works
 
 ---
