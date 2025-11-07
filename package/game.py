@@ -1,18 +1,15 @@
 import cmd
-import argparse
-from os import wait
-import shlex
 from InquirerPy import inquirer
-import os
+import pickle
 
 
 from .dice import Dice
 from .player import Player
-from .highscore import HighScore
 from .intelligence_easy import Easy as Low
 from .intelligence_medium import Medium
 from .intelligence_hard import Hard as High
-from .highscore import HighScore as Score_board
+
+# from .highscore import HighScore as Score_board
 from utils import Utils
 
 
@@ -25,9 +22,12 @@ class Game(cmd.Cmd):
     Rules:
     - Race to 100 points to win
     - Roll dice to accumulate points in your turn
-    - If you roll a 1 (in one dice game) and roll double 1s (in two-dice game), you lose all turn points and your turn ends
+    - If you roll a 1, you lose all turn points and your turn ends. 
+      If you roll double 1s (in two-dice game), you lose all accumulated points for the game 
+      and your turn ends
           
     Actions: 
+    - Type 'start' to start the game
     - Type 'help' for all commands
     - Type 'roll' to roll 
     - Type 'hold' to pass dice to the next player
@@ -41,50 +41,32 @@ class Game(cmd.Cmd):
 
     prompt = "piggame> "
 
-    def __init__(self):
+    def __init__(self, is_new=False):
         super().__init__()
-        self.parser = argparse.ArgumentParser(prog="start")
-        self.filepath = "data/game.json"
+        self.is_new = is_new
         self.player_one = None
         self.player_two = None
         self.is_opponent_robot = False
-        self.current_player = self.player_one
+        self.current_player = None
         self.dice = Dice()
-        self.score_board = Score_board()
+        # self.score_board = Score_board()
         self.is_round_over = False
         self.number_of_dice = 0
         self.intelligence_levels = {"l": Low(), "m": Medium(), "h": High()}
         self.intelligence = None
+        self.save_game = False
+
+    def set_is_new(self, is_new):
+        self.is_new = is_new
 
     def preloop(self):
-        """Take input before the main command loop starts"""
-        action = inquirer.select(
-            message="Resume saved game or start a new game?",
-            choices=["1: Resume", "2: Start a new game"],
-        ).execute()
-        if action.startswith("1"):
-            data = load_data()
-            self.player_one = Player(data.player_one_name)
-            self.player_two.player_name = Player(data.player_two_name)
-            self.player_one.set_score(data.player_one.points)
-            self.player_two.set_score(data.player_two.points)
-            self.current_player = data.current_player
-            self.is_opponent_robot = data.is_opponent_robot
-            self.is_round_over = data.is_round_over
-            self.is_paused = data.is_paused
-            self.number_of_dice = data.number_of_dice
-            self.intelligence = data.intelligence
+        if not self.is_new:
+            self.start_game()
             self.display_score_board()
 
-            Game.intro = """
-    ╔═══════════════════════════════════════╗
-    ║             Welcome back!             ║
-    ╚═══════════════════════════════════════╝
-    
-                """
-
-            Game.prompt = self.current_player.player_name + "> "
-        else:
+    def do_start(self, arg):
+        if self.is_new:
+            """Start a new game"""
             num_of_dice = inquirer.select(
                 message="How many dice?", choices=["1", "2"]
             ).execute()
@@ -119,6 +101,8 @@ class Game(cmd.Cmd):
                 self.player_two = Player(name2)
             self.current_player = self.player_one
             self.start_game()
+        else:
+            print("\nResuming the old game")
 
     def start_game(self):
         print("Game started")
@@ -326,39 +310,10 @@ class Game(cmd.Cmd):
 
     def do_namechange(self, arg):
         """Change your username"""
-        if self.is_opponent_robot:
-            new_name = input("Enter your new name: ")
-            self.current_player.player_name = new_name
-        else:
-            choice = inquirer.select(
-                message="Change name",
-                choices=[
-                    f"✔️ Yes. Change {self.current_player.player_name}: ",
-                    "❌No. Go back",
-                ],
-            ).execute()
-
-            if choice.startswith("✔️"):
-                new_name = inquirer.text(message="Enter new name: ").execute()
-                self.current_player.player_name = new_name
-                Game.prompt = self.current_player.player_name + "> "
-                print(
-                    f"\nYou have changed your name to {self.current_player.player_name}.\n"
-                )
-
-            elif choice.startswith("❌"):
-                print("\nGoing back to the game now!\n")
-
-    def save_game(self):
-        os.makedirs(os.path.dirname(self.filepath), exist_ok=True)
-        data = {
-            "name1": self.player_one.player_name,
-            "name2": self.player_two.player_name,
-            "points1": self.player_one.get_score(),
-            "points2": self.player_two.get_score(),
-        }
-        with open(self.filepath, "w") as f:
-            json.dump(data, f, indent=4)
+        new_name = input("Enter your new name: ")
+        self.current_player.player_name = new_name
+        print(f"\nYou have changed your name to {self.current_player.player_name}.\n")
+        Game.prompt = self.current_player.player_name + "> "
 
     def do_exit(self, arg):
         """Exit the game"""
@@ -366,10 +321,34 @@ class Game(cmd.Cmd):
             message="Save the game to resume later?",
             choices=["✔️ Yes", "❌No"],
         ).execute()
-        if choice.startswith("✔️"):
-            """to implement saving game later"""
-            self.save_game()
-            print("game saved. Type 'restart' to restart this game")
+        if choice.startswith("✔️ Yes"):
+            self.save_game = True
         else:
-            print("Exit without saving")
+            self.save_game = False
+            print("Game exited without saving.")
         return True
+
+    def __getstate__(self):
+        """Added this to solve "can't pickle TextIOwrapper" error"""
+        """Copy instance dictionary"""
+        state = self.__dict__.copy()
+
+        """Remove unpickleable cmd.Cmd attributes"""
+        for key in ("stdin", "stdout", "stderr"):
+            if key in state:
+                del state[key]
+        return state
+
+    def __setstate__(self, state):
+        self.__dict__.update(state)
+        import sys
+
+        self.stdin = sys.stdin
+        self.stdout = sys.stdout
+
+    def postloop(self):
+        if self.save_game:
+            """Save the whole object to a pickle file"""
+            with open("game_state.pkl", "wb") as f:
+                pickle.dump(self, f)
+                print("Game saved. Good bye!")
