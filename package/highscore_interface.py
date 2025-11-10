@@ -1,16 +1,17 @@
 from abc import ABC, abstractmethod
+from .player import Player
 
 
 class HighScoreInterface(ABC):
 
     # adds a new player to the high svcore list
     @abstractmethod
-    def add_player(self, name: str):
+    def add_player(self, player: Player):
         pass
 
-    # records a finished game for a player (its name, score and wins)
+    # records a finished match
     @abstractmethod
-    def record_game(self, name: str, score: int, won: bool):
+    def record_game(self, player1: Player, player2: Player, winner: Player):
         pass
 
     # returns stats for a specifc player
