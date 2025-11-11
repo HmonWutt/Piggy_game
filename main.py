@@ -12,7 +12,7 @@ if action.startswith("👍"):
     """Load the saved game object"""
     with open("game_state.pkl", "rb") as f:
         game = pickle.load(f)
-        game.set_is_new(False)
+        game.set_is_new_game(False)
         game.intro = """
     ╔═══════════════════════════════════════╗
     ║             Welcome back!             ║
