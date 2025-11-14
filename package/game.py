@@ -1,9 +1,9 @@
 import cmd
 import time
-from textwrap import wrap
 from InquirerPy import inquirer
 import pickle
-from functools import wraps
+
+from package.histogram import Histogram
 
 
 from .dice import Dice
@@ -11,8 +11,7 @@ from .player import Player
 from .intelligence_easy import Easy as Low
 from .intelligence_medium import Medium
 from .intelligence_hard import Hard as High
-
-from .highscore import HighScore as Score_board
+from .highscore import HighScore
 from utils import Utils
 
 
@@ -31,14 +30,14 @@ class Game(cmd.Cmd):
           
     Actions: 
     - Type 'start' to start the game
+    - Type 'changename' to change your name
     - Type 'help' for all commands
-    - Type 'roll' to roll 
-    - Type 'hold' to pass dice to the next player
+    - Type 'play' to play 
     - Type 'cheat' to win the round
     - Type 'pause' to pause the game
-    - Type 'resume' to resume the game
+    - Type 'unpause' to resume the game
+    - Type 'show' to see the leaderboard
     - Type 'exit' to exit the game
-    - Type 'show' to see players' statistics [COMING]
 
    """
 
@@ -52,15 +51,17 @@ class Game(cmd.Cmd):
         self.is_opponent_robot = False
         self.current_player = None
         self.dice = Dice()
-        self.score_board = Score_board()
+        self.score_record = HighScore()
         self.number_of_dice = 0
         self.intelligence = None
         self.save_game = False
         self.is_game_in_progress = True
         self.is_game_paused = False
+        self.winner = None
 
     def check_is_new_game(func):
-        @wraps(func)
+        """Check if the game new or restored from a previous game."""
+
         def wrapper(self, *args):
             if self.is_new_game:
                 func(self, *args)
@@ -70,17 +71,24 @@ class Game(cmd.Cmd):
         return wrapper
 
     def check_is_game_paused(func):
-        @wraps(func)
+        """If the game is paused, disable all actions except 'exit' and 'unpause' and
+        prompt user to type 'unpause' to unpause the game"""
+
         def wrapper(self, *args):
             if not self.is_game_paused:
                 func(self, *args)
             else:
-                print("\nGame paused. Type 'resume' to resume game")
+                print("\nGame paused. Type 'unpause' to resume game")
 
         return wrapper
 
-    def check_if_active_game(func):
-        @wraps(func)
+    def check_is_active_game(func):
+        """Check if there is a game in progress.
+        If a game is in progress, the 'start' action will be disabled
+        to disallow players from starting a new game while current game is in progress.
+        If there is no game in progress, all actions except 'start' and 'again' will be disabled
+        since players can't do game play actions while there is no active game"""
+
         def wrapper(self, *args):
             if self.is_game_in_progress:
                 func(self, *args)
@@ -90,14 +98,20 @@ class Game(cmd.Cmd):
         return wrapper
 
     def set_is_new_game(self, is_new_game):
+        """Set if this is a new game or restored from the saved game"""
         self.is_new_game = is_new_game
 
     def preloop(self):
+        """This wil run before the game loop begins, and start the game right away
+        if the properties are restored from the saved game.
+        If not this will be skipped and players will be asked
+        to add game settings such as the number of die, player names etc."""
         if not self.is_new_game:
             self.start_game()
             self.display_score_board()
 
     def choose_number_of_dice(self):
+        """Choose if one or two dice"""
         num_of_dice = inquirer.select(
             message="How many dice?", choices=["1", "2"]
         ).execute()
@@ -105,20 +119,8 @@ class Game(cmd.Cmd):
             return 1
         return 2
 
-    def choose_intelligence_level(self):
-        intel = inquirer.select(
-            message="How smart do you want your robot friend to be?",
-            choices=["Low", "Medium", "High"],
-        ).execute()
-
-        intelligence_levels = {"l": Low(), "m": Medium(), "h": High()}
-        if intel.startswith("L"):
-            return intelligence_levels["l"]
-        elif intel.startswith("M"):
-            return intelligence_levels["m"]
-        return intelligence_levels["h"]
-
     def choose_robot_or_human(self):
+        """Player chooses if they want to play with a robot or a human"""
         action = inquirer.select(
             message="Play with?", choices=["🦾 a robot", "💪 a human"]
         ).execute()
@@ -135,95 +137,67 @@ class Game(cmd.Cmd):
             self.player_two = Player(name2)
         self.start_game()
 
+    def choose_intelligence_level(self):
+        """Choose the IQ of the robot"""
+        intel = inquirer.select(
+            message="How smart do you want your robot friend to be?",
+            choices=["Low", "Medium", "High"],
+        ).execute()
+
+        intelligence_levels = {"l": Low(), "m": Medium(), "h": High()}
+        if intel.startswith("L"):
+            return intelligence_levels["l"]
+        elif intel.startswith("M"):
+            return intelligence_levels["m"]
+        return intelligence_levels["h"]
+
     @check_is_new_game
-    @check_if_active_game
+    @check_is_active_game
     def do_start(self, arg):
-        """Start a new game"""
+        """Player starts the game"""
         self.is_game_in_progress = True
         self.number_of_dice = self.choose_number_of_dice()
         self.choose_robot_or_human()
 
-    def rolled_one(self, face, faces, turn_score, points):
-        if self.count_ones(faces) == 1:
-            return 1, 0, points
-        elif self.count_ones(faces) == 2:
-            return 1, 0, 0
-        return 0, turn_score + face, face + points
-
-    def print_rolled_one_outcome(self, num_of_ones):
-        if num_of_ones == 1:
-            print("Rolled a single one and lost all the points from this turn.")
-        if num_of_ones == 2:
-            print("Rolled double ones and lost all points from this game.")
-        print("TURN ENDS.\n")
-
-    @check_is_new_game
     def start_game(self):
+        """Game starts or resumes"""
         print("Game started")
-
         self.is_paused = False
-        """Add players to the score board"""
-        # self.score_board.add_player(self.player_one.name)
         self.current_player = self.player_one
-        # self.score_board.add_player(self.player_two.name)
         self.is_game_in_progress = True
+        self.winner = None
         Game.prompt = self.current_player.name + "> "
 
-    def reset_player_scores(self):
-        """Reset players scores"""
-        self.player_two.set_score(0)
-        self.player_one.set_score(0)
-
-    def roll(self):
-        face = self.dice.roll()
-        graphic = self.dice.show_graphic_face()
-        print(f"Dice: {face} {graphic}")
-        return face
-
-    def run_winner_found_sequence(self, winner):
-        print()
-        self.is_game_in_progress = False
-        self.announce_winner(winner)
-        self.announce_game_end()
-        self.reset_player_scores()
-
-    def choose(self):
-        choice = inquirer.select(
-            message="Roll or hold", choices=["Roll", "Hold"]
-        ).execute()
-        if choice.startswith("R"):
-            return "Roll"
-        return "Hold"
-
-    @check_if_active_game
+    @check_is_active_game
     @check_is_game_paused
     def do_play(self, arg):
-        """Roll the dice"""
+        """Human plays"""
         faces = []
-        turn_score = 0
-        choice = self.choose()
-        points = self.current_player.get_score()
         is_winner_found = False
-        print(f"\n{self.current_player.name}'s total points: {points}")
+        turn_score = 0
+        choice = self.choose_roll_or_hold()
+        points = self.current_player.get_score()
+        print(
+            f"\n{self.current_player.name}'s total points: {points}, Round total: {turn_score}"
+        )
         while not choice.startswith("H"):
-            face = self.roll()
-            faces.append(face)
+            result, result_list = self.roll()
+            faces += result_list
             num_of_ones_rolled, turn_score, points = self.rolled_one(
-                face, faces, turn_score, points
+                result, faces, turn_score, points
             )
 
             if num_of_ones_rolled > 0:
                 self.print_rolled_one_outcome(num_of_ones_rolled)
-                self.switch_current_player()
                 break
             print(f"Total points: {points}, Round total: {turn_score}")
             self.current_player.set_score(points)
-            is_winner_found, winner = self.check_if_winner_found()
+            is_winner_found, self.winner = self.check_is_winner_found()
 
             if is_winner_found:
-                self.run_winner_found_sequence(winner)
+                self.run_winner_found_sequence()
                 break
-            choice = self.choose()
+            choice = self.choose_roll_or_hold()
         if not is_winner_found:
             if not self.is_opponent_robot:
                 self.switch_current_player()
@@ -234,70 +208,133 @@ class Game(cmd.Cmd):
 
     @check_is_game_paused
     def auto_play(self):
+        """Robot plays"""
         points = self.player_two.get_score()
-        print(f"Robot's points: {points}")
         turn_score = 0
+        is_winner_found = False
+        print(f"Robot's total points: {points}, Round total: {turn_score}")
         faces = []
         """opponent's score is set to 0 for now as it is not used"""
-        action = self.intelligence.decide(points, turn_score, 0)
+        action = self.intelligence.decide(turn_score, points, 0)
         while action != "hold":
             print(f"Robots action: {action}")
-            face = self.roll()
-            faces.append(face)
+            result, result_list = self.roll()
+            faces += result_list
             num_ones_rolled, turn_score, points = self.rolled_one(
-                face, faces, turn_score, points
+                result, faces, turn_score, points
             )
 
             if num_ones_rolled > 0:
                 self.print_rolled_one_outcome(num_ones_rolled)
-                self.pass_to_human()
                 break
             print(f"Total points: {points}, Round total: {turn_score}")
-            is_winner_found, winner = self.check_if_winner_found()
+            is_winner_found, self.winner = self.check_is_winner_found()
             if is_winner_found:
-                self.run_winner_found_sequence(winner)
+                self.run_winner_found_sequence()
                 break
             self.player_two.set_score(points)
-            action = self.intelligence.decide(points, turn_score, 0)
+            action = self.intelligence.decide(turn_score, points, 0)
 
-        if action == "hold":
+        if not is_winner_found:
             print(f"Robots action: {action}\n")
         self.pass_to_human()
 
-    def hold(self):
-        """Turn ends and pass to opponent"""
-        if not self.is_paused:
-            self.show_turn()
-        else:
-            print("game paused. type resume to continue playing\n")
+    def choose_roll_or_hold(self):
+        """Human chooses to roll the dice or hold"""
+        choice = inquirer.select(
+            message="Roll or hold", choices=["Roll", "Hold"]
+        ).execute()
+        if choice.startswith("R"):
+            return "Roll"
+        return "Hold"
 
-    def save_game(self, name, score, is_winner):
-        """Save points before passing to opponent"""
-        self.score_board.record_game(name, score, is_winner)
+    def roll(self):
+        """Roll the dice once or twice depending on how many dice there are"""
+        result_list = []
+        result = 0
+        print("Dice: ", end="")
+        for i in range(self.number_of_dice):
+            face = self.dice.roll()
+            result += face
+            result_list.append(face)
+            graphic = self.dice.show_graphic_face()
+            print(f"{graphic} ({face}) ", end="")
+        print()
+        return result, result_list
 
-    def show_turn(self):
-        """Robot auto_play and pass back to human"""
-        if self.is_opponent_robot:
-            self.auto_play()
-        else:
-            self.switch_current_player()
+    def rolled_one(self, face, faces, turn_score, points):
+        """Check if a one had been rolled"""
+        if self.count_ones(faces) == 1:
+            return 1, 0, points
+        elif self.count_ones(faces) == 2:
+            return 1, 0, 0
+        return 0, turn_score + face, face + points
+
+    def count_ones(self, faces):
+        """Count the number of ones in the list "faces"""
+        count = faces.count(1)
+        return count
+
+    def lose_points_from_game(self, player):
+        """Lost all points from this game as double one rolled"""
+        player.set_score(0)
+        print(f"Oh no! {player.name} rolled double ones and lost all points. ")
+
+    def lost_points_from_turn(self, player):
+        """Lost all points from this turn as a one rolled"""
+        print(f"Oh no! {player.name} rolled a one and lost all points from this turn.")
+
+    def print_rolled_one_outcome(self, num_of_ones):
+        """Check how many ones have been rolled this round to decide if the player had lost
+        points from this round, points from this game, or no points at all"""
+        if num_of_ones == 1:
+            print("Rolled a single one and lost all the points from this turn.")
+        if num_of_ones == 2:
+            print("Rolled double ones and lost all points from this game.")
+        print("TURN ENDS.\n")
 
     def switch_current_player(self):
-        if self.player_one is not self.current_player:
-            self.current_player = self.player_one
-        else:
+        """Set current player to the other player when current player's turn ends.
+        Change name in prompt"""
+        if self.player_one is self.current_player:
             self.current_player = self.player_two
+        else:
+            self.current_player = self.player_one
         self.is_player_switched = True
         Game.prompt = self.current_player.name + "> "
 
     def pass_to_human(self):
-        """Do nothing just print that it's human's turn now"""
+        """Change current player to human. Change name in prompt"""
         self.current_player = self.player_one
         Game.prompt = self.player_one.name + "> "
 
+    def check_is_winner_found(self):
+        if self.player_one.get_score() >= 100:
+            return True, self.player_one
+        elif self.player_two.get_score() >= 100:
+            return True, self.player_two
+        return False, None
+
+    def run_winner_found_sequence(self):
+        """Set that there is no active game;
+        Announce winner;
+        Announce that game ended;
+        save the game to json file;
+        reset player points to zero"""
+        print()
+        self.is_game_in_progress = False
+        self.announce_winner(self.winner)
+        self.announce_game_end()
+        self.score_record.record_game(self.player_one, self.player_two, self.winner)
+        self.reset_player_scores()
+
+    def reset_player_scores(self):
+        """Reset players scores"""
+        self.player_two.set_score(0)
+        self.player_one.set_score(0)
+
     def display_score_board(self):
-        """Display score board. To add info from saved file once it has been fixed"""
-        # info = self.score_board.get_all_players()
+        """Display in game score board."""
         info = {
             self.player_one.name: self.player_one.get_score(),
             self.player_two.name: self.player_two.get_score(),
@@ -310,26 +347,8 @@ class Game(cmd.Cmd):
     """
         Utils.print_dict_table(info, banner)
 
-    def check_if_winner_found(self):
-        if self.player_one.get_score() >= 100:
-            return True, self.player_one
-        elif self.player_two.get_score() >= 100:
-            return True, self.player_two
-        return False, None
-
-    def count_ones(self, faces):
-        count = faces.count(1)
-        return count
-
     def announce_winner(self, player):
         print(f"{player.name} has won. Congrats🎉")
-
-    def lose_points_from_game(self, player):
-        player.set_score(0)
-        print(f"Oh no! {player.name} rolled double ones and lost all points. ")
-
-    def lost_points_from_turn(self, player):
-        print(f"Oh no! {player.name} rolled a one and lost all points from this turn.")
 
     def announce_game_end(self):
         print("\nGAME OVER!. Type 'again' to play another game")
@@ -337,21 +356,21 @@ class Game(cmd.Cmd):
 
     @check_is_game_paused
     def do_again(self, arg):
-        """Play a new game"""
+        """Play a new game with the same game settings"""
         if not self.is_game_in_progress:
             self.reset_player_scores()
             self.start_game()
 
-    @check_if_active_game
+    @check_is_active_game
     @check_is_game_paused
     def do_cheat(self, arg):
         """Cheat to win"""
         self.current_player.set_score(100)
-        is_winner_found, winner = self.check_if_winner_found()
+        is_winner_found, self.winner = self.check_is_winner_found()
         if is_winner_found:
-            self.run_winner_found_sequence(winner)
+            self.run_winner_found_sequence()
 
-    @check_if_active_game
+    @check_is_active_game
     def do_pause(self, arg):
         """Save game data to file and pause the game"""
         # self.save_game()
@@ -364,21 +383,33 @@ class Game(cmd.Cmd):
         just_the_rules = Game.intro.splitlines()[4:14]
         print("\n".join(just_the_rules))
 
-    @check_if_active_game
-    def do_resume(self, arg):
+    @check_is_active_game
+    def do_unpause(self, arg):
         """Resuming game"""
         self.is_paused = False
         self.display_score_board()
         Game.prompt = self.current_player.name + "> "
 
-    @check_if_active_game
+    @check_is_active_game
     @check_is_game_paused
-    def do_namechange(self, arg):
+    def do_changename(self, arg):
         """Change your username"""
         new_name = input("Enter your new name: ")
         self.current_player.name = new_name
         print(f"\nYou have changed your name to {self.current_player.name}.\n")
         Game.prompt = self.current_player.name + "> "
+
+    def do_show(self, arg):
+        """Show statistics"""
+        choice = inquirer.select(
+            message="What would you like to see?",
+            choices=["Leaderboard", "Player names"],
+        ).execute()
+        stats = Histogram(self.score_record)
+        if choice.startswith("L"):
+            stats.display_wins()
+        else:
+            stats.display_games_played()
 
     def do_exit(self, arg):
         """Exit the game"""
@@ -388,6 +419,7 @@ class Game(cmd.Cmd):
         ).execute()
         if choice.startswith("✔️ Yes"):
             self.save_game = True
+            self.is_new_game = False
         else:
             self.save_game = False
             print("Game exited without saving.")
@@ -407,6 +439,7 @@ class Game(cmd.Cmd):
         return state
 
     def __setstate__(self, state):
+        """Added this to solve "can't pickle TextIOwrapper" error when pickling"""
         self.__dict__.update(state)
         import sys
 
@@ -415,7 +448,7 @@ class Game(cmd.Cmd):
 
     def postloop(self):
         if self.save_game:
-            """Save the whole object to a pickle file"""
+            """Pickle the whole game object"""
             with open("game_state.pkl", "wb") as f:
                 pickle.dump(self, f)
                 print("Game saved. Good bye!")
