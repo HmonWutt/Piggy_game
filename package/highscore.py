@@ -43,6 +43,7 @@ class HighScore(HighScoreInterface):
                 "wins": 0,
                 "highest_score": 0,
             }
+        self.save_data()
 
     def update_player_name(self, old_name: str, new_name: str):
         """ Updates a players name in the json file.
