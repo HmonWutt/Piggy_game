@@ -1,25 +1,28 @@
+""" The interface for the HighScore class. """
+
 from abc import ABC, abstractmethod
 from .player import Player
 
 
 class HighScoreInterface(ABC):
+    """ Interface for HighScore class. """
 
-    # adds a new player to the high svcore list
     @abstractmethod
     def add_player(self, player: Player):
+        """ Adds a new player to the high score list. """
         pass
 
-    # records a finished match
     @abstractmethod
     def record_game(self, player1: Player, player2: Player, winner: Player):
+        """ Records a finished match. """
         pass
 
-    # returns stats for a specifc player
     @abstractmethod
     def get_player_stats(self, name: str) -> dict:
+        """ Returns stats for a specifc player. """
         pass
 
-    # resturns stats for all players
     @abstractmethod
     def get_all_players(self) -> dict:
+        """ Returns stats for all players. """
         pass

@@ -3,73 +3,75 @@ from package.player import Player
 
 
 class TestPlayer:
+    """ Test suite for Player class. """
 
     def setup_method(self):
+        """ Sets up an instance before test. """
         self.player = Player("Alice")
 
-    # the constructor sets the name correctly
     def test_constructor_name(self):
-        assert self.player.player_name == "Alice"
-        assert isinstance(self.player.player_name, str)
+        """ The constructor should set the name correctly. """
+        assert self.player.name == "Alice"
+        assert isinstance(self.player.name, str)
 
-    # checks if change name works
     def test_change_name(self):
+        """ Name change should work. """
         self.player.change_name("Bob")
-        assert self.player.player_name == "Bob"
-        assert self.player.player_name != "Alice"
+        assert self.player.name == "Bob"
+        assert self.player.name != "Alice"
 
-    # changing name multiple times
     def test_change_name_multiple(self):
+        """ Changing names multiple times should work. """
         names = ["Charlie", "Diana", "Eve"]
 
         for name in names:
             self.player.change_name(name)
-            assert self.player.player_name == name
-            assert isinstance(self.player.player_name, str)
+            assert self.player.name == name
+            assert isinstance(self.player.name, str)
 
-    # name should always be a string
     def test_name_type(self):
+        """ Name should always be a string. """
         self.player.change_name("Frank")
-        assert isinstance(self.player.player_name, str)
-        assert type(self.player.player_name) is str
+        assert isinstance(self.player.name, str)
+        assert type(self.player.name) is str
 
-    # name is never empty
     def test_name_not_empty(self):
-        assert self.player.player_name != ""
+        """ Name should never be empty. """
+        assert self.player.name != ""
         self.player.change_name("George")
-        assert self.player.player_name != ""
-    
-    # intial score should be 0
+        assert self.player.name != ""
+
     def test_initial_score(self):
+        """ Intial score should be 0. """
         assert self.player.get_score() == 0
         assert self.player.score == 0
-    
-    # set score method updates the score correctly
+
     def test_set_score(self):
+        """ set_score method should update the score correctly. """
         self.player.set_score(10)
         assert self.player.get_score() == 10
         assert self.player.score == 10
 
-    # update score many times
     def test_set_score_many_times(self):
+        """ Update score many times correctly. """
         scores = [5, 20, 50, 0]
         for s in scores:
             self.player.set_scores(s)
             assert self.player.get_score() == s
             assert self.player.score == s
 
-    # score can be 0 or positive
     def test_score_non_negative(self):
+        """ Score can be 0 or positive. """
         self.player.set_score(0)
         assert self.player.get_score() == 0
         self.player.set_score(15)
         assert self.player.get_score() > 0
 
-    # combination of name change and score
     def test_name_and_score(self):
+        """ Combination of name change and score. """
         self.player.change_name("Hannah")
         self.player.set_score(25)
-        assert self.player.player_name == "Hannah"
-        assert isinstance(self.player.player_name, str)
+        assert self.player.name == "Hannah"
+        assert isinstance(self.player.name, str)
         assert self.player.get_score() == 25
         assert self.player.score == 25
