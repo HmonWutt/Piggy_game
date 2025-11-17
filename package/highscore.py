@@ -18,7 +18,7 @@ class HighScore(HighScoreInterface):
         self.load_data()
 
     def load_data(self):
-        """ Loads data from the json file or creates it if 
+        """ Loads data from the json file or creates it if
         it doesnt already exist. """
         if os.path.exists(self.filepath):
             with open(self.filepath, "r") as f:
@@ -44,6 +44,20 @@ class HighScore(HighScoreInterface):
                 "highest_score": 0,
             }
 
+    def update_player_name(self, old_name: str, new_name: str):
+        """ Updates a players name in the json file.
+        Args:
+            old_name (str): The players current name saved in the json file.
+            new_name (str): The new name which will replace the old one. """
+        players = self.data["Players"]
+
+        if old_name not in players:
+            return
+
+        players[new_name] = players[old_name]
+        del players[old_name]
+        self.save_data()
+
     def record_game(self, player1, player2, winner):
         """ Updates player stats after a match.
         Args:
@@ -60,10 +74,10 @@ class HighScore(HighScoreInterface):
 
             if player is winner:
                 stats["wins"] += 1
-            
+
             if player.get_score() > stats["highest_score"]:
                 stats["highest_score"] = player.get_score()
-        
+
         self.save_data()
 
     def get_player_stats(self, name: str) -> dict:
