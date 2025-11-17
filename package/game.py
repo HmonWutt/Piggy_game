@@ -373,9 +373,11 @@ class Game(cmd.Cmd):
     @check_is_game_paused
     def do_changename(self, arg):
         """Change your username"""
+        old_name = self.current_player.get_name()
         new_name = input("Enter your new name: ")
         self.current_player.change_name(new_name)
         print(f"\nYou have changed your name to {self.current_player.get_name()}.\n")
+        self.score_record.update_player_name(old_name, new_name)
         Game.prompt = self.current_player.get_name() + "> "
 
     def do_show(self, arg):
