@@ -374,9 +374,9 @@ class Game(cmd.Cmd):
     def do_changename(self, arg):
         """Change your username"""
         new_name = input("Enter your new name: ")
-        self.current_player.name = new_name
-        print(f"\nYou have changed your name to {self.current_player.name}.\n")
-        Game.prompt = self.current_player.name + "> "
+        self.current_player.change_name(new_name)
+        print(f"\nYou have changed your name to {self.current_player.get_name()}.\n")
+        Game.prompt = self.current_player.get_name() + "> "
 
     def do_show(self, arg):
         """Show statistics"""

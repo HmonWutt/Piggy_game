@@ -13,7 +13,10 @@ class Player:
 
     # rename player
     def change_name(self, new_name: str):
-        self.player_name = new_name
+        self.name = new_name
+
+    def get_name(self):
+        return self.name
 
     def set_score(self, score):
         self.score = score
