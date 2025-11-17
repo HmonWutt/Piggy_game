@@ -11,7 +11,7 @@ TEST_DIR := piggy_game/test
 .PHONY: run
 run:
 	@echo "Starting Piggy Game..."
-	$(PYTHON) -m piggy_game.package.main
+	$(PYTHON) main.py
 
 # installs all the dependencies
 .PHONY: install
@@ -22,9 +22,18 @@ install:
 
 # runsa ll the unit tests with pytest
 .PHONY: test
-test:
-	@echo "Running unit tests..."
-	pytest --maxfail=1 --disable-warnings -q
+
+
+test: pytest unittest
+# Run pytest
+pytest:
+	@echo "Running pytest tests..."
+	pytest
+
+# Run unittest (discover all tests in the current directory)
+unittest:
+	@echo "Running unittest tests..."
+	python -m unittest discover -s tests -p "*.py"
 
 # runs test with coverage report
 .PHONY: coverage
