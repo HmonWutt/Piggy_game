@@ -29,19 +29,19 @@
 
 ## ⚙️ Functional Requirements
 
-- [ ] 1-player mode (vs computer) implemented
-- [ ] 2-player mode implemented
-- [ ] Player can select and change their name
+- [x] 1-player mode (vs computer) implemented
+- [x] 2-player mode implemented
+- [x] Player can select and change their name
 - [ ] Persistent high-score system (saves across sessions)
 - [ ] High scores persist even if player name changes
-- [ ] Rules of the game viewable
-- [ ] Full game round playable
-- [ ] Restart and quit options available
-- [ ] Cheat function for testing implemented
-- [ ] Text-based visuals added (ASCII/UTF-8)
-- [ ] Computer AI implemented
-- [ ] Configurable AI difficulty levels
-- [ ] Handles invalid input gracefully
+- [x] Rules of the game viewable
+- [x] Full game round playable
+- [x] Restart and quit options available
+- [x] Cheat function for testing implemented
+- [x] Text-based visuals added (ASCII/UTF-8)
+- [x] Computer AI implemented
+- [ ] Configurable AI difficulty levels---to clarify if dice are rolled one by one or two at once
+- [x] Handles invalid input gracefully
 - [ ] README includes description of how AI/intelligence works
 
 ---
@@ -51,10 +51,10 @@
 - [x] Each class in its own file
 - [x] Object-oriented design used
 - [x] Small, clear methods
-- [ ] Follows **PEP 20 (The Zen of Python)**
-- [ ] Follows **PEP 8 style guide**
-- [ ] Functional programming used where appropriate
-- [ ] > 50 commits and ~10 tags in Git (guideline)
+- [x] Follows **PEP 20 (The Zen of Python)**
+- [x] Follows **PEP 8 style guide**
+- [x] Functional programming used where appropriate
+- [x] > 50 commits and ~10 tags in Git (guideline)
 - [x] `Makefile` created (optional but recommended) **Dechen**
   - [x] `make run` – run the game
   - [x] `make test` – run tests
@@ -67,12 +67,12 @@
 
 ## 🧪 Unit Testing
 
-- [ ] One test file per class
-- [ ] Each class has at least **10 test cases**
-- [ ] Each class has at least **20 assertions**
+- [x] One test file per class
+- [x] Each class has at least **10 test cases**
+- [x] Each class has at least **20 assertions**
 - [ ] Coverage > **90%**
 - [ ] Test invalid input cases
-- [ ] Test AI logic
+- [x] Test AI logic
 - [ ] Test persistence (high-score saving/loading)
 - [ ] README includes instructions to:
   - [ ] Run the test suite
@@ -84,7 +84,7 @@
 
 ### 1. Code Documentation
 
-- [ ] All classes, methods, and functions have proper **docstrings**
+- [x] All classes, methods, and functions have proper **docstrings**
 
 ### 2. Auto-generated Documentation
 
@@ -95,7 +95,7 @@
 
 ### 3. UML Diagrams
 
-- [ ] Tool chosen (e.g., pyreverse, PlantUML, UMLet)
+- [ ] Tool chosen (e.g., pyreverse, )
 - [ ] Generated **class diagram** and **package diagram**
 - [ ] Stored under `doc/uml`
 - [ ] Make target `make uml` works
@@ -112,7 +112,7 @@
   - [ ] `flake8-polyfill`
 - [ ] Lint warnings fixed (not silenced)
 - [ ] Passes code style check with `black`, `pylint`, and `flake8`
-- [ ] Add target `make lint`
+- [x] Add target `make lint`
 
 ---
 

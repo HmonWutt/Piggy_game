@@ -1,8 +1,25 @@
+from modulefinder import test
 import unittest, os, shutil
 from pathlib import Path
 from package.highscore import HighScore
 from functools import wraps
 from utils.utils import Utils
+
+
+def print_test_result(test_func):
+    @wraps(test_func)
+    def wrapper(*args):
+        try:
+            test_func(*args)
+            print(f"✓ {test_func.__name__} passed")
+            print(
+                "----------------------------------------------------------------------"
+            )
+        except AssertionError as e:
+            print(f"✗ {test_func.__name__} failed: {e}")
+            raise
+
+    return wrapper
 
 
 class TestHighscore(unittest.TestCase):
@@ -12,21 +29,6 @@ class TestHighscore(unittest.TestCase):
         self.file_path = os.path.abspath(
             os.path.join(os.path.dirname(__file__), "..", "data", "highscores.json")
         )
-
-    def print_test_result(test_func):
-        @wraps(test_func)
-        def wrapper(self):
-            try:
-                test_func(self)
-                print(f"✓ {test_func.__name__} passed")
-                print(
-                    "----------------------------------------------------------------------"
-                )
-            except AssertionError as e:
-                print(f"✗ {test_func.__name__} failed: {e}")
-                raise
-
-        return wrapper
 
     @print_test_result
     def test_load_data_no_existing_file(self):

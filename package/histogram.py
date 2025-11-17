@@ -1,11 +1,11 @@
-from histogram_interface import HistogramInterface
-from highscore import HighScore
+from .histogram_interface import HistogramInterface
+from .highscore import HighScore
 
 
 class Histogram(HistogramInterface):
 
     # initializes Histogram with a HighScore object
-    def _init_(self, highscore: HighScore):
+    def __init__(self, highscore: HighScore):
         self.highscore = highscore
 
     # display ASCII bar chart for games played per player
