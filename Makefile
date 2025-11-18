@@ -33,7 +33,7 @@ pytest:
 # Run unittest (discover all tests in the current directory)
 unittest:
 	@echo "Running unittest tests..."
-	python -m unittest discover -s tests -p "*.py"
+	python -m unittest discover -s test -p "*.py"
 
 # runs test with coverage report
 .PHONY: coverage
