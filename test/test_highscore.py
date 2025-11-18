@@ -1,7 +1,7 @@
 import unittest, os, shutil
 from functools import wraps
 
-from piggy_game.package import HighScore, Utils
+from piggy_game.package import HighScore, Utils, Player
 
 
 def print_test_result(test_func):
@@ -82,35 +82,30 @@ class TestHighscore(unittest.TestCase):
                 }
             }
         }
-        self.highscore.add_player("John")
+        self.highscore.add_player(Player("John"))
         self.assertEqual(self.highscore.data, dict)
 
     @print_test_result
     def test_record_game_win(self):
         old_record = {
             "Players": {
-                "Julie": {
+                "Jan": {
                     "games_played": 1,
                     "wins": 1,
-                    "highest_score": 20,
-                }
-            }
-        }
-        self.highscore.record_game("Julie", 20, True)
-        self.assertEqual(self.highscore.data, old_record)
-
-    @print_test_result
-    def test_record_game_loss(self):
-        old_record = {
-            "Players": {
-                "Jenny": {
+                    "highest_score": 105,
+                },
+                "John": {
                     "games_played": 1,
                     "wins": 0,
-                    "highest_score": 40,
-                }
+                    "highest_score": 45,
+                },
             }
         }
-        self.highscore.record_game("Jenny", 40, False)
+        jan = Player("Jan")
+        jan.set_score(105)
+        john = Player("John")
+        john.set_score(45)
+        self.highscore.record_game(jan, john, jan)
         self.assertEqual(self.highscore.data, old_record)
 
     def tearDown(self):
