@@ -3,16 +3,14 @@ import time
 from InquirerPy import inquirer
 import pickle
 
-from package.histogram import Histogram
-
-
+from .histogram import Histogram
 from .dice import Dice
 from .player import Player
 from .intelligence_easy import Easy as Low
 from .intelligence_medium import Medium
 from .intelligence_hard import Hard as High
 from .highscore import HighScore
-from utils import Utils
+from .utils import Utils
 
 
 class Game(cmd.Cmd):

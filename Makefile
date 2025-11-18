@@ -4,7 +4,7 @@
 PYTHON := python3
 
 # directories
-PACKAGE := piggy_game/package
+PACKAGE := piggy_game
 TEST_DIR := piggy_game/test
 
 # runs the game
@@ -33,7 +33,7 @@ pytest:
 # Run unittest (discover all tests in the current directory)
 unittest:
 	@echo "Running unittest tests..."
-	python -m unittest discover -s tests -p "*.py"
+	PYTHONPATH=$$(dirname $$(pwd)) python -m unittest discover -s test -p "*.py"
 
 # runs test with coverage report
 .PHONY: coverage

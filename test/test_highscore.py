@@ -1,9 +1,7 @@
-from modulefinder import test
 import unittest, os, shutil
-from pathlib import Path
-from package.highscore import HighScore
 from functools import wraps
-from utils.utils import Utils
+
+from piggy_game.package import HighScore, Utils
 
 
 def print_test_result(test_func):
