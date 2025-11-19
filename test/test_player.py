@@ -56,7 +56,7 @@ class TestPlayer:
         """Update score many times correctly."""
         scores = [5, 20, 50, 0]
         for s in scores:
-            self.player.set_scores(s)
+            self.player.set_score(s)
             assert self.player.get_score() == s
             assert self.player.score == s
 
