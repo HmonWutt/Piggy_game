@@ -1,7 +1,6 @@
-import pytest
 from package.intelligence_easy import Easy
-from package.intelligence_medium import Medium
 from package.intelligence_hard import Hard
+from package.intelligence_medium import Medium
 
 
 class TestIntelligenceEasy:

@@ -1,6 +1,7 @@
 """ The interface for the HighScore class. """
 
 from abc import ABC, abstractmethod
+
 from .player import Player
 
 
