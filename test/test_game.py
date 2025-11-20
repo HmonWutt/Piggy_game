@@ -1,6 +1,8 @@
 import unittest
-from package import Game, Dice, HighScore
+
+from package import Dice, Game, HighScore
 from package.intelligence_interface import Intelligence
+
 
 class TestGame(unittest.TestCase):
     def setUp(self):
@@ -56,7 +58,7 @@ class TestGame(unittest.TestCase):
 
         self.assertIsInstance(game.intelligence, Intelligence)
         self.assertEqual(game.intelligence.decide(10, 20, 30), "hold")
-        
+
     # Tests for game state
     def test_game_in_progress(self):
         game = Game()

@@ -2,8 +2,8 @@
 
 import json
 import os
+
 from .highscore_interface import HighScoreInterface
-from .player import Player
 
 
 class HighScore(HighScoreInterface):
