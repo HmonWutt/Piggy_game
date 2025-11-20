@@ -1,5 +1,7 @@
 import pytest
-from piggy_game.package import Easy, Medium, Hard
+from package.intelligence_easy import Easy
+from package.intelligence_medium import Medium
+from package.intelligence_hard import Hard
 
 
 class TestIntelligenceEasy:
@@ -60,10 +62,10 @@ class TestIntelligenceHard:
         self.ai = Hard()
 
     def test_hard_if_can_win_hold(self):
-        """Hard Ai should choose hold when turn score + total score
-        >= 100."""
-        assert self.ai.decide(20, 90, 80) == "hold"
-        assert self.ai.decide(5, 97, 30) == "hold"
+        """Hard Ai should choose hold when total score < 71 or
+        turn score > 25."""
+        assert self.ai.decide(27, 50, 80) == "hold"
+        assert self.ai.decide(26, 56, 30) == "hold"
 
     def test_hard_roll_under_strategy_conditions(self):
         """Hard Ai should choose roll when total_score >= 71 or
@@ -72,16 +74,14 @@ class TestIntelligenceHard:
         assert self.ai.decide(24, 75, 70) == "roll"
 
     def test_hard_otherwise_hold(self):
-        """Hard Ai should choose hold when not total_score + turn_score >= 100
-        and not total_score >= 71 or turn_score < 25."""
+        """Hard Ai should choose hold when total score < 71 or
+        turn score > 25."""
         assert self.ai.decide(30, 50, 90) == "hold"
         assert self.ai.decide(25, 70, 50) == "hold"
 
     def test_hard_boundary_cases(self):
-        """Hard Ai should choose roll when total_score >= 71 or turn_score <
-        25 and hold when total_score + turn_score >= 100.
-        Hard Ai should also choose hold when not total_score + turn_score
-        >= 100 and not total_score >= 71 or turn_score < 25."""
-        assert self.ai.decide(0, 71, 0) == "roll"
-        assert self.ai.decide(24, 71, 10) == "roll"
-        assert self.ai.decide(25, 70, 30) == "hold"
+        """Hard Ai should choose roll when total_score >= 71 or
+        turn_score < 25 otherwise hold."""
+        assert self.ai.decide(0, 81, 0) == "roll"
+        assert self.ai.decide(24, 72, 10) == "roll"
+        assert self.ai.decide(25, 50, 30) == "hold"

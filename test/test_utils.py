@@ -2,7 +2,7 @@ import json
 from this import d
 import unittest
 from unittest.mock import mock_open, patch
-from piggy_game.package import Utils
+from package import Utils
 from .test_highscore import print_test_result
 
 
