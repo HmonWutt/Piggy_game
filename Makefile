@@ -1,6 +1,6 @@
-# Piggy_game - Makefile
+# Piggy_game - Cross-platform Makefile
 
-# Python executable
+# Detect Python executable
 PYTHON := python3
 ifeq ($(OS),Windows_NT)
 	PYTHON := python
@@ -10,41 +10,58 @@ endif
 PACKAGE := Piggy_game
 TEST_DIR := test
 
-# RUN GAME
+# Helper vars for PYTHONPATH setting
+ifeq ($(OS),Windows_NT)
+    # Windows (CMD / PowerShell)
+    SET_PYTHONPATH := set PYTHONPATH=.
+    AND := &&
+else
+    # macOS / Linux
+    SET_PYTHONPATH := PYTHONPATH=.
+    AND := 
+endif
+
+
+# ========================= RUN GAME =========================
 .PHONY: run
 run:
 	@echo "Starting Piggy Game..."
 	$(PYTHON) -m main
 
-# INSTALL DEPENDENCIES
+
+# ========================= INSTALL ==========================
 .PHONY: install
 install:
 	@echo "Installing dependencies..."
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -r requirements.txt
 
-# UNIT TESTS
+
+# ========================= UNIT TESTS ========================
 .PHONY: test
 test:
 	@echo "Running ALL tests (pytest + unittest)..."
-	PYTHONPATH=. python3 -m pytest
-	PYTHONPATH=. python3 -m unittest discover -s test -p "test_*.py" -t .
+	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m pytest
+	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m unittest discover -s test -p "test_*.py" -t .
 
-# COVERAGE
+
+# ========================= COVERAGE =========================
 .PHONY: coverage
 coverage:
 	@echo "Running coverage report..."
-	PYTHONPATH=. python3 -m pytest --cov=package --cov-report=term-missing --cov-report=html
+	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m pytest --cov=package --cov-report=term-missing --cov-report=html
 
-# LINTING
+
+# ========================= LINTING ==========================
 .PHONY: lint
 lint:
 	@echo "Running flake8..."
-	flake8 Piggy_game --select=D
+	flake8 package test main.py
 	@echo "Running pylint..."
-	PYTHONPATH=. pylint Piggy_game || true
+	$(SET_PYTHONPATH) $(AND) pylint package test main.py || true
 
-# DOCUMENTATION (SPHINX)
+
+# ========================= DOCUMENTATION =====================
 .PHONY: doc
 doc:
 	@echo "Building Sphinx documentation..."
@@ -52,19 +69,20 @@ doc:
 	sphinx-build -b html doc/source doc/api
 	@echo "Docs generated at doc/api"
 
-# UML DIAGRAMS
+
+# ========================= UML DIAGRAMS ======================
 .PHONY: uml
 uml:
 	@echo "Generating UML diagrams..."
 	mkdir -p doc/uml
-	pyreverse -o png -p Piggy_game $(PACKAGE)
+	pyreverse -o png -p $(PACKAGE) $(PACKAGE)
 	@echo "Moving UML diagrams..."
-	- mv classes_piggy_game.png doc/uml/class_diagram.png 2>/dev/null || true
-	- mv packages_piggy_game.png doc/uml/package_diagram.png 2>/dev/null || true
+	- mv classes_$(PACKAGE).png doc/uml/class_diagram.png 2>/dev/null || true
+	- mv packages_$(PACKAGE).png doc/uml/package_diagram.png 2>/dev/null || true
 	@echo "UML diagrams saved to doc/uml"
 
 
-# CLEAN BUILD ARTIFACTS
+# ========================= CLEAN =============================
 .PHONY: clean
 clean:
 	@echo "Cleaning cached files..."
@@ -73,7 +91,8 @@ clean:
 	- rm -rf htmlcov .pytest_cache doc/api doc/uml 2>/dev/null || true
 	@echo "Cleanup completed."
 
-# RUN EVERYTHING
+
+# ========================= RUN ALL TASKS =====================
 .PHONY: all
-all: install lint test coverage doc uml
+all: install test coverage doc uml lint
 	@echo "All tasks completed successfully!"
