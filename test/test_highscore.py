@@ -1,7 +1,7 @@
 import unittest, os, shutil
 from functools import wraps
 
-from piggy_game.package import HighScore, Utils, Player
+from package import HighScore, Utils, Player
 
 
 def print_test_result(test_func):

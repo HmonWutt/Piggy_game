@@ -17,3 +17,7 @@ inquirerpy==0.3.4
 pfzy==0.3.4
 prompt_toolkit==3.0.52
 wcwidth==0.2.14
+pytest-cov==5.0.0
+flake8-docstrings==1.7.0
+pydocstyle==6.3.0
+sphinx==7.1.2

@@ -2,7 +2,7 @@ import sys
 import os
 import unittest
 
-from piggy_game.package import Dice
+from package.dice import Dice
 
 
 class TestDice(unittest.TestCase):

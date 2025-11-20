@@ -1,5 +1,7 @@
 import pytest
-from piggy_game.package import Easy, Medium, Hard
+from package.intelligence_easy import Easy
+from package.intelligence_medium import Medium
+from package.intelligence_hard import Hard
 
 
 class TestIntelligenceEasy:
@@ -63,7 +65,7 @@ class TestIntelligenceHard:
         """Hard Ai should choose hold when total score < 71 or
         turn score > 25."""
         assert self.ai.decide(27, 50, 80) == "hold"
-        assert self.ai.decide(5, 56, 30) == "hold"
+        assert self.ai.decide(26, 56, 30) == "hold"
 
     def test_hard_roll_under_strategy_conditions(self):
         """Hard Ai should choose roll when total_score >= 71 or

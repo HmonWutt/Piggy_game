@@ -7,14 +7,14 @@ ifeq ($(OS),Windows_NT)
 endif
 
 # Paths
-PACKAGE := piggy_game
-TEST_DIR := piggy_game/test
+PACKAGE := Piggy_game
+TEST_DIR := test
 
 # RUN GAME
 .PHONY: run
 run:
 	@echo "Starting Piggy Game..."
-	$(PYTHON) -m piggy_game.main
+	$(PYTHON) -m main
 
 # INSTALL DEPENDENCIES
 .PHONY: install
@@ -27,30 +27,29 @@ install:
 .PHONY: test
 test:
 	@echo "Running ALL tests (pytest + unittest)..."
-	$(PYTHON) -m pytest
-	$(PYTHON) -m unittest discover -s $(TEST_DIR) -p "test_*.py"
+	PYTHONPATH=. python3 -m pytest
+	PYTHONPATH=. python3 -m unittest discover -s test -p "test_*.py" -t .
 
 # COVERAGE
 .PHONY: coverage
 coverage:
 	@echo "Running coverage report..."
-	PYTHONPATH=. $(PYTHON) -m pytest --cov=$(PACKAGE) --cov-report=term-missing --cov-report=html
-	@echo "Coverage report generated in htmlcov/index.html"
+	PYTHONPATH=. python3 -m pytest --cov=package --cov-report=term-missing --cov-report=html
 
 # LINTING
 .PHONY: lint
 lint:
 	@echo "Running flake8..."
-	flake8 $(PACKAGE) --docstring-convention=google
+	flake8 Piggy_game --select=D
 	@echo "Running pylint..."
-	pylint $(PACKAGE) || true
+	PYTHONPATH=. pylint Piggy_game || true
 
 # DOCUMENTATION (SPHINX)
 .PHONY: doc
 doc:
 	@echo "Building Sphinx documentation..."
 	mkdir -p doc/api
-	sphinx-build -b html docs/source doc/api
+	sphinx-build -b html doc/source doc/api
 	@echo "Docs generated at doc/api"
 
 # UML DIAGRAMS
@@ -58,7 +57,7 @@ doc:
 uml:
 	@echo "Generating UML diagrams..."
 	mkdir -p doc/uml
-	pyreverse -o png -p piggy_game $(PACKAGE)
+	pyreverse -o png -p Piggy_game $(PACKAGE)
 	@echo "Moving UML diagrams..."
 	- mv classes_piggy_game.png doc/uml/class_diagram.png 2>/dev/null || true
 	- mv packages_piggy_game.png doc/uml/package_diagram.png 2>/dev/null || true
