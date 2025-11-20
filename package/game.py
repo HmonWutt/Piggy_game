@@ -1,6 +1,7 @@
 import cmd
 import pickle
 import time
+from functools import wraps
 
 from InquirerPy import inquirer
 
@@ -59,7 +60,7 @@ class Game(cmd.Cmd):
 
     def check_is_new_game(func):
         """Check if the game new or restored from a previous game."""
-
+        @wraps(func)
         def wrapper(self, *args):
             if self.is_new_game:
                 func(self, *args)
@@ -72,7 +73,7 @@ class Game(cmd.Cmd):
         """If the game is paused, disable all actions except
         'exit' and 'unpause' and
         prompt user to type 'unpause' to unpause the game"""
-
+        @wraps(func)
         def wrapper(self, *args):
             if not self.is_game_paused:
                 func(self, *args)
@@ -91,7 +92,7 @@ class Game(cmd.Cmd):
         except 'start' and 'again' will be disabled
         since players can't do game play actions
         while there is no active game"""
-
+        @wraps(func)
         def wrapper(self, *args):
             if self.is_game_in_progress:
                 func(self, *args)
@@ -112,6 +113,7 @@ class Game(cmd.Cmd):
         to add game settings such as the number of die,
         player names etc."""
         if not self.is_new_game:
+            self.is_game_paused = False
             self.start_game()
             self.display_score_board()
 
@@ -140,6 +142,7 @@ class Game(cmd.Cmd):
             name2 = input("Enter player two name: ")
             self.player_one = Player(name1)
             self.player_two = Player(name2)
+            self.is_opponent_robot = False
         self.start_game()
 
     def choose_intelligence_level(self):
@@ -169,7 +172,7 @@ class Game(cmd.Cmd):
     def start_game(self):
         """Game starts or resumes"""
         print("Game started")
-        self.is_paused = False
+        self.is_game_paused = False
         self.current_player = self.player_one
         self.is_game_in_progress = True
         Game.prompt = self.current_player.get_name() + "> "
@@ -374,7 +377,7 @@ class Game(cmd.Cmd):
     @check_is_active_game
     def do_unpause(self, arg):
         """Unpause the game"""
-        self.is_paused = False
+        self.is_game_paused = False
         self.display_score_board()
         Game.prompt = self.current_player.name + "> "
 

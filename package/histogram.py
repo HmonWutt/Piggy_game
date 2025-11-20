@@ -24,7 +24,7 @@ class Histogram(HistogramInterface):
         print("Games played:")
         for name, stats in sorted_players:
             count = stats["games_played"]
-            bar = "🏆" * count
+            bar = "🎮" * count
             print(f"{name:12} | {count:3} {bar}")
         print()
 

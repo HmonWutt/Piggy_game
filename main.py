@@ -18,7 +18,7 @@ if action.startswith("✅"):
     ╔═══════════════════════════════════════╗
     ║             Welcome back!             ║
     ╚═══════════════════════════════════════╝
-     Rules:
+      Rules:
     - Race to 100 points to win
     - Roll dice to accumulate points in your turn
     - If you roll a 1, you lose all turn points and your turn ends.
@@ -26,15 +26,15 @@ if action.startswith("✅"):
       and your turn ends
 
     Actions:
-    - Type 'start' to start the game
+    - Type 'start' to start a game
+    - Type 'changename' to change your name
     - Type 'help' for all commands
-    - Type 'roll' to roll
-    - Type 'hold' to pass dice to the next player
+    - Type 'play' to play
     - Type 'cheat' to win the round
     - Type 'pause' to pause the game
-    - Type 'resume' to resume the game
+    - Type 'unpause' to resume the game
+    - Type 'show' to see the leaderboard
     - Type 'exit' to exit the game
-    - Type 'show' to see players' statistics [COMING]
  """
 else:
     game = Game(True)
