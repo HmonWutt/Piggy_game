@@ -40,6 +40,8 @@ install:
 # ========================= UNIT TESTS ========================
 .PHONY: test
 test:
+
+	- rm -rf data/ 2>/dev/null || true
 	@echo "Running ALL tests (pytest + unittest)..."
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m pytest
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m unittest discover -s test -p "test_*.py" -t .
@@ -56,9 +58,9 @@ coverage:
 .PHONY: lint
 lint:
 	@echo "Running flake8..."
-	flake8 package test main.py
+	flake8 package test main.py --ignore=E501
 	@echo "Running pylint..."
-	$(SET_PYTHONPATH) $(AND) pylint package test main.py || true
+	$(SET_PYTHONPATH) $(AND) pylint package test main.py --max-line-length=120 
 
 
 # ========================= DOCUMENTATION =====================

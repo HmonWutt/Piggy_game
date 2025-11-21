@@ -4,7 +4,9 @@ import cmd
 import pickle
 import time
 from functools import wraps
+
 from InquirerPy import inquirer
+
 from .dice import Dice
 from .highscore import HighScore
 from .histogram import Histogram
@@ -214,10 +216,7 @@ class Game(cmd.Cmd):
                 turn_score = 0
                 self.print_rolled_one_outcome(num_of_ones_rolled)
                 break
-            print(
-                f"Total points: {
-                    points +
-                    turn_score}, Round total: {turn_score}")
+            print(f"Total points: {points + turn_score}, Round total: {turn_score}")  # noqa
             if points + turn_score >= 100:
                 points = 0
                 turn_score = 0
@@ -264,10 +263,7 @@ class Game(cmd.Cmd):
                 self.run_winner_found_sequence(self.player_two)
                 is_winner_found = True
                 break
-            print(
-                f"Total points: {
-                    points +
-                    turn_score}, Round total: {turn_score}.\n")
+            print(f"Total points: {points + turn_score}, Round total: {turn_score}.\n")  # noqa
             action = self.intelligence.decide(turn_score, points, 0)
         if action == "hold":
             print(f"Robots action: {action}\n")
