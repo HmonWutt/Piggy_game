@@ -67,6 +67,7 @@ install:
 .PHONY: test
 test:
 	@echo "Running ALL tests (pytest + unittest)..."
+	$(SET_PYTHONPATH) $(AND) $(PYTHON) scripts/clean.py
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m pytest
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m unittest discover -s test -p "test_*.py" -t .
 
