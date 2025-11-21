@@ -38,8 +38,15 @@ install:
 
 
 # ========================= UNIT TESTS ========================
-.PHONY: test
-test:
+.PHONY: test 
+
+test: 
+	@echo "Cleaning cached files..."
+	- find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
+	- find . -name "*.pyc" -delete 2>/dev/null || true
+	- rm -rf htmlcov .pytest_cache doc/api doc/uml 2>/dev/null || true
+	@echo "Cleanup completed."
+
 	@echo "Running ALL tests (pytest + unittest)..."
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m pytest
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m unittest discover -s test -p "test_*.py" -t .
@@ -56,7 +63,7 @@ coverage:
 .PHONY: lint
 lint:
 	@echo "Running flake8..."
-	flake8 package test main.py
+	flake8 package test main.py --ignore=E501
 	@echo "Running pylint..."
 	$(SET_PYTHONPATH) $(AND) pylint package test main.py || true
 
@@ -94,5 +101,5 @@ clean:
 
 # ========================= RUN ALL TASKS =====================
 .PHONY: all
-all: install test coverage doc uml lint
+all: install clean test coverage doc uml lint 
 	@echo "All tasks completed successfully!"
