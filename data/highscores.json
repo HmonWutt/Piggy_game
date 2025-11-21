@@ -1,0 +1,19 @@
+{
+    "Players": {
+        "akfjiewa": {
+            "games_played": 1,
+            "wins": 1,
+            "highest_score": 100
+        },
+        "Robot": {
+            "games_played": 2,
+            "wins": 0,
+            "highest_score": 29
+        },
+        "ajkruweia": {
+            "games_played": 1,
+            "wins": 1,
+            "highest_score": 100
+        }
+    }
+}

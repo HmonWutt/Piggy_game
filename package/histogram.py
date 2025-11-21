@@ -25,8 +25,8 @@ class Histogram(HistogramInterface):
         print("Games played:")
         for name, stats in sorted_players:
             count = stats["games_played"]
-            bar = "🎮" * count
-            print(f"{name:12} | {count:3} {bar}")
+            row = "🎮" * count
+            print(f"{name:12} | {count:3} {row}")
         print()
 
     def display_wins(self):  # pragma: no cover
@@ -39,6 +39,6 @@ class Histogram(HistogramInterface):
         print("Wins:")
         for name, stats in sorted_players:
             count = stats["wins"]
-            bar = "🏆" * count
-            print(f"{name:12} | {count:3} {bar}")
+            row = "🏆" * count
+            print(f"{name:12} | {count:3} {row}")
         print()

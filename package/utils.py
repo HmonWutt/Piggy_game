@@ -6,6 +6,37 @@ import json
 class Utils:
     """Represent a Utils."""
 
+    welcome_back_banner = """
+    ╔═══════════════════════════════════════╗
+    ║             Welcome back!             ║
+    ╚═══════════════════════════════════════╝
+"""
+    banner_text = """Rules:
+    - Race to 100 points to win
+    - Roll dice to accumulate points in your turn
+    - If you roll a 1, you lose all turn points and your turn ends.
+      If you roll double 1s (in two-dice game), you lose all accumulated
+      points for the game and your turn ends
+
+    Actions:
+    - Type 'start' to start a game
+    - Type 'changename' to change your name
+    - Type 'help' for all commands
+    - Type 'play' to play
+    - Type 'cheat' to win the round
+    - Type 'pause' to pause the game
+    - Type 'unpause' to resume the game
+    - Type 'show' to see the leaderboard
+    - Type 'exit' to exit the game
+ """
+
+    welcome_banner = """
+    ╔═══════════════════════════════════════╗
+    ║         Welcome to PIG GAME!          ║
+    ╚═══════════════════════════════════════╝
+
+"""
+
     @staticmethod
     def write_to_file(file_path, file_content):
         """Write to file."""

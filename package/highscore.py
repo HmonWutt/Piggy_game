@@ -22,7 +22,7 @@ class HighScore(HighScoreInterface):
     def load_data(self):
         """Load data from json file or create a new one."""
         if os.path.exists(self.filepath):
-            with open(self.filepath, "r") as f:
+            with open(self.filepath, "r", encoding="utf-8") as f:
                 self.data = json.load(f)
         else:
             self.save_data()
@@ -30,7 +30,7 @@ class HighScore(HighScoreInterface):
     def save_data(self):
         """Save the current data to the json file."""
         os.makedirs(os.path.dirname(self.filepath), exist_ok=True)
-        with open(self.filepath, "w") as f:
+        with open(self.filepath, "w", encoding="utf-8") as f:
             json.dump(self.data, f, indent=4)
 
     def add_player(self, player):
