@@ -74,9 +74,9 @@
 - [ ] Test invalid input cases
 - [x] Test AI logic
 - [ ] Test persistence (high-score saving/loading)
-- [ ] README includes instructions to:
-  - [ ] Run the test suite
-  - [ ] View coverage report
+- [x] README includes instructions to:
+  - [x] Run the test suite
+  - [x] View coverage report
 
 ---
 
@@ -105,29 +105,29 @@
 
 ## 🧹 Code Style & Linters
 
-- [ ] Installed and configured:
-  - [ ] `pylint`
-  - [ ] `flake8`
-  - [ ] `flake8-docstrings`
-  - [ ] `flake8-polyfill`
+- [x] Installed and configured:
+  - [x] `pylint`
+  - [x] `flake8`
+  - [x] `flake8-docstrings`
+  - [x] `flake8-polyfill`
 - [ ] Lint warnings fixed (not silenced)
-- [ ] Passes code style check with `black`, `pylint`, and `flake8`
+- [x] Passes code style check with `black`, `pylint`, and `flake8`
 - [x] Add target `make lint`
 
 ---
 
 ## 📝 README.md (Rebecca)
 
-- [ ] Project description
-- [ ] Game rules and basic info
-- [ ] Installation instructions
-- [ ] How to run the game
-- [ ] How to run tests and view coverage
-- [ ] How to regenerate documentation
-- [ ] How to regenerate UML diagrams
-- [ ] Description of AI/intelligence design
-- [ ] Project structure overview
-- [ ] Developer information (optional)
+- [x] Project description
+- [x] Game rules and basic info
+- [x] Installation instructions
+- [x] How to run the game
+- [x] How to run tests and view coverage
+- [x] How to regenerate documentation
+- [x] How to regenerate UML diagrams
+- [x] Description of AI/intelligence design
+- [x] Project structure overview
+- [x] Developer information (optional)
 
 ---
 
@@ -146,15 +146,15 @@
 
 ## ✅ Self-Test (Before Submission)
 
-- [ ] Can install and run from fresh zip/repo
-- [ ] README complete and clear
-- [ ] All requirements implemented
-- [ ] Handles invalid inputs robustly
-- [ ] Passes code style and linters
+- [x] Can install and run from fresh zip/repo
+- [x] README complete and clear
+- [x] All requirements implemented
+- [x] Handles invalid inputs robustly
+- [x] Passes code style and linters
 - [ ] Test coverage ≥ 90%
-- [ ] Documentation regenerates correctly
-- [ ] UML regenerates correctly
-- [ ] Game functions as expected
+- [x] Documentation regenerates correctly
+- [x] UML regenerates correctly
+- [x] Game functions as expected
 
 ---
 
