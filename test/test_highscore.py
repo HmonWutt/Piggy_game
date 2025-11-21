@@ -9,6 +9,7 @@ from package import HighScore, Player, Utils
 
 def print_test_result(test_func):
     """Decorate the print test result."""
+
     @wraps(test_func)
     def wrapper(*args):
         try:
@@ -32,11 +33,8 @@ class TestHighscore(unittest.TestCase):
         self.highscore = HighScore()
         self.file_content = {"content": "dummy_content"}
         self.file_path = os.path.abspath(
-            os.path.join(
-                os.path.dirname(__file__),
-                "..",
-                "data",
-                "highscores.json"))
+            os.path.join(os.path.dirname(__file__), "..", "data", "highscores.json")
+        )
 
     @print_test_result
     def test_load_data_no_existing_file(self):
@@ -78,10 +76,7 @@ class TestHighscore(unittest.TestCase):
     @print_test_result
     def test_get_all_players(self):
         """Get stats of all players."""
-        self.highscore.data = {
-            "Players": {
-                "player_one": 100,
-                "player_two": 200}}
+        self.highscore.data = {"Players": {"player_one": 100, "player_two": 200}}
         result = self.highscore.get_all_players()
         self.assertEqual(
             result,

@@ -58,6 +58,7 @@ class TestGame(unittest.TestCase):
 
     def test_assign_intelligence(self):
         """Test assigning an intelligence."""
+
         class DummyIntelligence(Intelligence):
             def decide(self, turn_score, total_score, opponent_score):
                 return "hold"
