@@ -3,8 +3,8 @@
 import cmd
 import pickle
 import time
+import sys
 from functools import wraps
-
 from InquirerPy import inquirer
 
 from .dice import Dice
@@ -20,31 +20,7 @@ from .utils import Utils
 class Game(cmd.Cmd):
     """Command-line interface and controller for the Pig Game."""
 
-    intro = """
-    ╔═══════════════════════════════════════╗
-    ║         Welcome to PIG GAME!          ║
-    ╚═══════════════════════════════════════╝
-
-    Rules:
-    - Race to 100 points to win
-    - Roll dice to accumulate points in your turn
-    - If you roll a 1, you lose all turn points and your turn ends.
-      If you roll double 1s (in two-dice game), you lose all accumulated
-      points for the game and your turn ends
-
-    Actions:
-    - Type 'start' to start a game
-    - Type 'changename' to change your name
-    - Type 'help' for all commands
-    - Type 'play' to play
-    - Type 'cheat' to win the round
-    - Type 'pause' to pause the game
-    - Type 'unpause' to resume the game
-    - Type 'show' to see the leaderboard
-    - Type 'exit' to exit the game
-
-   """
-
+    intro = Utils.welcome_banner + Utils.banner_text
     prompt = "piggame> "
 
     def __init__(self, is_new_game=False):
@@ -67,9 +43,9 @@ class Game(cmd.Cmd):
         """Check if the game new or restored from a previous game."""
 
         @wraps(func)
-        def wrapper(self, *args):
+        def wrapper(self, *arg):
             if self.is_new_game:
-                func(self, *args)
+                func(self, *arg)
             else:
                 print("\nResuming the old game")
 
@@ -84,9 +60,9 @@ class Game(cmd.Cmd):
         """
 
         @wraps(func)
-        def wrapper(self, *args):
+        def wrapper(self, *arg):
             if not self.is_game_paused:
-                func(self, *args)
+                func(self, *arg)
             else:
                 print("\nGame paused. Type 'unpause' to resume game")
 
@@ -106,9 +82,9 @@ class Game(cmd.Cmd):
         """
 
         @wraps(func)
-        def wrapper(self, *args):
+        def wrapper(self, *arg):
             if self.is_game_in_progress:
-                func(self, *args)
+                func(self, *arg)
             else:
                 print("No active game. Type 'start' to start a new game")
 
@@ -171,7 +147,7 @@ class Game(cmd.Cmd):
         intelligence_levels = {"l": Low(), "m": Medium(), "h": High()}
         if intel.startswith("L"):
             return intelligence_levels["l"]
-        elif intel.startswith("M"):
+        if intel.startswith("M"):
             return intelligence_levels["m"]
         return intelligence_levels["h"]
 
@@ -247,7 +223,6 @@ class Game(cmd.Cmd):
         points = self.player_two.get_score()
         turn_score = 0
         print(f"Robot's total points: {points}, Round total: {turn_score}")
-        """Opponent's score is set to 0 for now as it is not used."""
         action = self.intelligence.decide(turn_score, points, 0)
         is_winner_found = False
         while action != "hold":
@@ -294,7 +269,7 @@ class Game(cmd.Cmd):
         result_list = []
         result = 0
         print("Dice: ", end="")
-        for i in range(self.number_of_dice):
+        for _ in range(self.number_of_dice):
             face = self.dice.roll()
             result += face
             result_list.append(face)
@@ -456,29 +431,16 @@ class Game(cmd.Cmd):
         return True
 
     def __getstate__(self):  # pragma: no cover
-        """Fix error.
-
-        Added this to solve "can't pickle
-        TextIOwrapper" error when pickling.
-        """
-        """Copy instance dictionary."""
-        state = self.__dict__.copy()
-
         """Remove unpickleable cmd.Cmd attributes."""
+        state = self.__dict__.copy()
         for key in ("stdin", "stdout", "stderr"):
             if key in state:
                 del state[key]
         return state
 
     def __setstate__(self, state):  # pragma: no cover
-        """Fix error.
-
-        Added this to solve "can't pickle
-        TextIOwrapper" error when pickling.
-        """
+        """Fix error:TextIOwrapper" error when pickling."""
         self.__dict__.update(state)
-        import sys
-
         self.stdin = sys.stdin
         self.stdout = sys.stdout
 
