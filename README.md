@@ -34,22 +34,9 @@ pip install -r requirements.txt
 ```
 
 You can also choose to install the dependencies using:
-
 `make install`
 
-### Installing Graphviz
-
-Graphviz is required to generate UML diagrams for this project. To install:
-
-**macOS (using Homebrew):**
-`brew install graphviz`
-
-**Linux (Debian/Ubuntu):**
-`sudo apt-get update && sudo apt-get install graphviz`
-
-**Windows:** Download Graphviz from [https://graphviz.org/download/](https://graphviz.org/download/), install it, and make sure to add Graphviz to your system PATH so `dot` is accessible from the command line.
-
-After installing Graphviz, you can generate UML diagrams by running:
+You can generate UML diagrams by running:
 `make uml`
 
 ## Usage
