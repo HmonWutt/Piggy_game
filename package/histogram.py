@@ -20,9 +20,8 @@ class Histogram(HistogramInterface):
         players = self.highscore.get_all_players()
 
         sorted_players = sorted(
-            players.items(),
-            key=lambda item: item[1]["games_played"],
-            reverse=True)
+            players.items(), key=lambda item: item[1]["games_played"], reverse=True
+        )
         print("Games played:")
         for name, stats in sorted_players:
             count = stats["games_played"]
