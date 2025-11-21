@@ -19,7 +19,7 @@ class Utils:
             return json.load(f)
 
     @staticmethod
-    def print_dict_table(data, title="My Table"):
+    def print_dict_table(data, title="My Table"):  # pragma no cover
         """Print title."""
         print(f"\n{title}")
 

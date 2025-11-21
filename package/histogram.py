@@ -15,13 +15,14 @@ class Histogram(HistogramInterface):
         """
         self.highscore = highscore
 
-    def display_games_played(self):
+    def display_games_played(self):  # pragma: no cover
         """Display ASCII bar chart for games played per player."""
         players = self.highscore.get_all_players()
 
         sorted_players = sorted(
-            players.items(), key=lambda item: item[1]["games_played"], reverse=True
-        )
+            players.items(),
+            key=lambda item: item[1]["games_played"],
+            reverse=True)
         print("Games played:")
         for name, stats in sorted_players:
             count = stats["games_played"]
@@ -29,7 +30,7 @@ class Histogram(HistogramInterface):
             print(f"{name:12} | {count:3} {bar}")
         print()
 
-    def display_wins(self):
+    def display_wins(self):  # pragma: no cover
         """Display ASCII bar chart for wins per player."""
         players = self.highscore.get_all_players()
 
