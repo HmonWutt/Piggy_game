@@ -10,13 +10,7 @@ class Dice(Dice_interface):
     def __init__(self):
         """Initialize values."""
         self.face = None
-        self.dice_faces = [
-            "\u2680",
-            "\u2681",
-            "\u2682",
-            "\u2683",
-            "\u2684",
-            "\u2685"]
+        self.dice_faces = ["\u2680", "\u2681", "\u2682", "\u2683", "\u2684", "\u2685"]
 
     @property
     def face(self):

@@ -65,6 +65,7 @@ class Game(cmd.Cmd):
 
     def check_is_new_game(func):
         """Check if the game new or restored from a previous game."""
+
         @wraps(func)
         def wrapper(self, *args):
             if self.is_new_game:
@@ -81,6 +82,7 @@ class Game(cmd.Cmd):
         'exit' and 'unpause' and prompt user to type 'unpause'
         to unpause the game.
         """
+
         @wraps(func)
         def wrapper(self, *args):
             if not self.is_game_paused:
@@ -102,6 +104,7 @@ class Game(cmd.Cmd):
         since players can't do game play actions
         while there is no active game.
         """
+
         @wraps(func)
         def wrapper(self, *args):
             if self.is_game_in_progress:
@@ -216,7 +219,9 @@ class Game(cmd.Cmd):
                 turn_score = 0
                 self.print_rolled_one_outcome(num_of_ones_rolled)
                 break
-            print(f"Total points: {points + turn_score}, Round total: {turn_score}")  # noqa
+            print(
+                f"Total points: {points + turn_score}, Round total: {turn_score}"
+            )  # noqa
             if points + turn_score >= 100:
                 points = 0
                 turn_score = 0
@@ -263,7 +268,9 @@ class Game(cmd.Cmd):
                 self.run_winner_found_sequence(self.player_two)
                 is_winner_found = True
                 break
-            print(f"Total points: {points + turn_score}, Round total: {turn_score}.\n")  # noqa
+            print(
+                f"Total points: {points + turn_score}, Round total: {turn_score}.\n"
+            )  # noqa
             action = self.intelligence.decide(turn_score, points, 0)
         if action == "hold":
             print(f"Robots action: {action}\n")
@@ -407,7 +414,8 @@ class Game(cmd.Cmd):
         self.current_player.change_name(new_name)
         print(
             f"\nYou have changed your name to {
-                self.current_player.get_name()}.\n")
+                self.current_player.get_name()}.\n"
+        )
         self.score_record.update_player_name(old_name, new_name)
         Game.prompt = self.current_player.get_name() + "> "
 

@@ -20,4 +20,5 @@ __all__ = [
     "Histogram",
     "HighScore",
     "Game",
-    "Dice"]
+    "Dice",
+]
