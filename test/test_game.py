@@ -1,11 +1,15 @@
-import unittest
+"""Test for game class."""
 
+import unittest
 from package import Dice, Game, HighScore
 from package.intelligence_interface import Intelligence
 
 
 class TestGame(unittest.TestCase):
+    """Test suite for game class."""
+
     def setUp(self):
+        """Set up the test."""
         game = Game()
 
         self.assertFalse(game.is_new_game)
@@ -22,16 +26,18 @@ class TestGame(unittest.TestCase):
         self.assertFalse(game.is_game_paused)
 
     def test_new_game(self):
+        """Test a new game."""
         game = Game(is_new_game=True)
         self.assertTrue(game.is_new_game)
 
-    # Tests for game setup
     def test_set_number_of_dice(self):
+        """Test game setup."""
         game = Game()
         game.number_of_dice = 2
         self.assertEqual(game.number_of_dice, 2)
 
     def test_set_players(self):
+        """Test setting players."""
         game = Game()
         game.player_one = "Steve"
         game.player_two = "James"
@@ -39,16 +45,19 @@ class TestGame(unittest.TestCase):
         self.assertEqual(game.player_two, "James")
 
     def test_set_current_player(self):
+        """Test setting the current player."""
         game = Game()
         game.current_player = "Steve"
         self.assertEqual(game.current_player, "Steve")
 
     def test_set_robot(self):
+        """Test setting a robot."""
         game = Game()
         game.is_opponent_robot = True
         self.assertTrue(game.is_opponent_robot)
 
     def test_assign_intelligence(self):
+        """Test assigning an intelligence."""
         class DummyIntelligence(Intelligence):
             def decide(self, turn_score, total_score, opponent_score):
                 return "hold"
@@ -59,29 +68,32 @@ class TestGame(unittest.TestCase):
         self.assertIsInstance(game.intelligence, Intelligence)
         self.assertEqual(game.intelligence.decide(10, 20, 30), "hold")
 
-    # Tests for game state
     def test_game_in_progress(self):
+        """Test game state."""
         game = Game()
         game.is_game_in_progress = True
         self.assertTrue(game.is_game_in_progress)
 
     def test_game_paused(self):
+        """Test if game is paused."""
         game = Game()
         game.is_game_paused = True
         self.assertTrue(game.is_game_paused)
 
     def test_save_game(self):
+        """Test saving a game."""
         game = Game()
         game.save_game = True
         self.assertTrue(game.save_game)
 
-    # Tests for dice
     def test_roll(self):
+        """Test a dice roll."""
         game = Game()
         result = game.dice.roll()
         self.assertTrue(1 <= result <= 6)
 
     def test_multiple_roll(self):
+        """Test multiple dice rolls."""
         game = Game()
         game.number_of_dice = 2
 

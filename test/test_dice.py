@@ -1,12 +1,14 @@
-import unittest
+"""Test for dice class."""
 
+import unittest
 from package.dice import Dice
 
 
 class TestDice(unittest.TestCase):
-    def test_roll(self):
-        """Test if the return value of function is between 1 and 6, inclusive"""
+    """Test suite for dice.py."""
 
+    def test_roll(self):
+        """Test if the return value of function is between 1 and 6, inclusive."""
         dice = Dice()
         dice.roll()
         value = dice.face

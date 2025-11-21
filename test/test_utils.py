@@ -1,15 +1,17 @@
+"""Test for utils.py."""
+
 import unittest
 from unittest.mock import mock_open, patch
-
 from package import Utils
-
 from .test_highscore import print_test_result
 
 
 class TestUtils(unittest.TestCase):
+    """Test suite for utils.py."""
+
     @print_test_result
     def test_write_to_file(self):
-        """Test function that writes to json file"""
+        """Test function that writes to json file."""
         mock = mock_open()
 
         with patch("builtins.open", mock), patch("json.dump") as mock_dump:
@@ -19,7 +21,7 @@ class TestUtils(unittest.TestCase):
 
     @print_test_result
     def test_read_from_file(self):
-        """Test the function that reads from json file"""
+        """Test the function that reads from json file."""
         mock = mock_open()
         with (
             patch("builtins.open", mock),
