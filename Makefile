@@ -9,18 +9,44 @@ endif
 # Paths
 PACKAGE := Piggy_game
 TEST_DIR := test
+VENV_DIR := venv
 
 # Helper vars for PYTHONPATH setting
 ifeq ($(OS),Windows_NT)
-    # Windows (CMD / PowerShell)
-    SET_PYTHONPATH := set PYTHONPATH=.
-    AND := &&
+	PY := $(VENV_DIR)\Scripts\python.exe
+	SET_PYTHONPATH := set PYTHONPATH=.
+	AND := &&
 else
-    # macOS / Linux
-    SET_PYTHONPATH := PYTHONPATH=.
-    AND := 
+	PY := $(VENV_DIR)/bin/python
+	SET_PYTHONPATH := PYTHONPATH=.
+	AND :=
 endif
 
+# ========================= VIRTUAL ENVIRONMENT =====================
+.PHONY: venv
+venv:
+	@echo "Creating virtual environment..."
+ifeq ($(OS),Windows_NT)
+	@if not exist $(VENV_DIR) (
+		python -m venv $(VENV_DIR)
+	) else (
+		echo "Virtual environment already exists."
+	)
+	@echo "To activate the venv in CMD:"
+	@echo "    $(VENV_DIR)\\Scripts\\activate.bat"
+	@echo "Or in PowerShell:"
+	@echo "    $(VENV_DIR)\\Scripts\\Activate.ps1"
+else
+	@if [ ! -d "$(VENV_DIR)" ]; then \
+		python3 -m venv $(VENV_DIR); \
+	else \
+		echo "Virtual environment already exists."; \
+	fi
+	@echo "To activate the venv, run:"
+	@echo "    source $(VENV_DIR)/bin/activate"
+endif
+	@echo "Then install dependencies with:"
+	@echo "    make install"
 
 # ========================= RUN GAME =========================
 .PHONY: run
