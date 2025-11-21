@@ -5,16 +5,18 @@ from .histogram_interface import HistogramInterface
 
 
 class Histogram(HistogramInterface):
-    """Represents ASCII Histogram for player statistics."""
+    """Represent ASCII Histogram for player statistics."""
 
     def __init__(self, highscore: HighScore):
-        """Initializes Histogram with a HighScore object.
+        """Initialize Histogram with a HighScore object.
+
         Args:
-            highscore (HighScore): A HighScore object."""
+            highscore (HighScore): A HighScore object.
+        """
         self.highscore = highscore
 
     def display_games_played(self):
-        """Displays ASCII bar chart for games played per player."""
+        """Display ASCII bar chart for games played per player."""
         players = self.highscore.get_all_players()
 
         sorted_players = sorted(

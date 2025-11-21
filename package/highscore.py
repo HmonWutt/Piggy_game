@@ -1,4 +1,4 @@
-""" The HighScore class which saves and loads data from a json file. """
+"""The HighScore class which saves and loads data from a json file."""
 
 import json
 import os
@@ -7,19 +7,20 @@ from .highscore_interface import HighScoreInterface
 
 
 class HighScore(HighScoreInterface):
-    """ Represents a HighScore. """
+    """Represent a HighScore."""
 
     def __init__(self, filepath="data/highscores.json"):
-        """ Initializing HighScore with json file path.
+        """Initialize HighScore with json file path.
+
         Args:
-            filepath (str): Path to the json file. """
+            filepath (str): Path to the json file.
+        """
         self.filepath = filepath
         self.data = {"Players": {}}
         self.load_data()
 
     def load_data(self):
-        """ Loads data from the json file or creates it if
-        it doesnt already exist. """
+        """Load data from json file or create a new one."""
         if os.path.exists(self.filepath):
             with open(self.filepath, "r") as f:
                 self.data = json.load(f)
@@ -27,15 +28,17 @@ class HighScore(HighScoreInterface):
             self.save_data()
 
     def save_data(self):
-        """ Saves the current data to the json file. """
+        """Save the current data to the json file."""
         os.makedirs(os.path.dirname(self.filepath), exist_ok=True)
         with open(self.filepath, "w") as f:
             json.dump(self.data, f, indent=4)
 
     def add_player(self, player):
-        """ Adds a new player if they dont already exist in the json file.
+        """Add a new player if they dont already exist in the json file.
+
         Args:
-            player (Player): Player object. """
+            player (Player): Player object.
+        """
         name = player.name
         if name not in self.data["Players"]:
             self.data["Players"][name] = {
@@ -46,10 +49,12 @@ class HighScore(HighScoreInterface):
         self.save_data()
 
     def update_player_name(self, old_name: str, new_name: str):
-        """ Updates a players name in the json file.
+        """Update a players name in the json file.
+
         Args:
             old_name (str): The players current name saved in the json file.
-            new_name (str): The new name which will replace the old one. """
+            new_name (str): The new name which will replace the old one.
+        """
         players = self.data["Players"]
 
         if old_name not in players:
@@ -60,11 +65,13 @@ class HighScore(HighScoreInterface):
         self.save_data()
 
     def record_game(self, player1, player2, winner):
-        """ Updates player stats after a match.
+        """Update player stats after a match.
+
         Args:
             player1 (Player): First Player object.
             player2 (Player): Second Player object.
-            winner (Player): The Player object who won. """
+            winner (Player): The Player object who won.
+        """
         self.add_player(player1)
         self.add_player(player2)
 
@@ -82,16 +89,20 @@ class HighScore(HighScoreInterface):
         self.save_data()
 
     def get_player_stats(self, name: str) -> dict:
-        """ Returns stats for a specific player and an empty dict
-            if not found.
-            Args:
-                name (str): The name of the player.
-            Returns:
-                dict: Player stats stored as dictionary. """
+        """Return stats for a player.
+
+        Args:
+            name (str): The name of the player.
+
+        Returns:
+            dict: Player stats stored as dictionary.
+        """
         return self.data["Players"].get(name, {})
 
     def get_all_players(self) -> dict:
-        """ Returns stats for all players.
+        """Return stats for all players.
+
         Returns:
-            dict: Stats of all players stored as dictionary. """
+            dict: Stats of all players stored as dictionary.
+        """
         return self.data["Players"]
