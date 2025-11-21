@@ -66,8 +66,6 @@ install:
 # ========================= UNIT TESTS ========================
 .PHONY: test
 test:
-
-	- rm -rf data/ 2>/dev/null || true
 	@echo "Running ALL tests (pytest + unittest)..."
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m pytest
 	$(SET_PYTHONPATH) $(AND) $(PYTHON) -m unittest discover -s test -p "test_*.py" -t .
@@ -93,34 +91,22 @@ lint:
 .PHONY: doc
 doc:
 	@echo "Building Sphinx documentation..."
-	mkdir -p doc/api
-	sphinx-build -b html doc/source doc/api
-	@echo "Docs generated at doc/api"
-
+	$(SET_PYTHONPATH) $(AND) $(PYTHON) scripts/doc.py
 
 # ========================= UML DIAGRAMS ======================
 .PHONY: uml
 uml:
 	@echo "Generating UML diagrams..."
-	mkdir -p doc/uml
-	pyreverse -o png -p $(PACKAGE) $(PACKAGE)
-	@echo "Moving UML diagrams..."
-	- mv classes_$(PACKAGE).png doc/uml/class_diagram.png 2>/dev/null || true
-	- mv packages_$(PACKAGE).png doc/uml/package_diagram.png 2>/dev/null || true
-	@echo "UML diagrams saved to doc/uml"
+	$(SET_PYTHONPATH) $(AND) $(PYTHON) scripts/uml.py
 
 
 # ========================= CLEAN =============================
 .PHONY: clean
 clean:
 	@echo "Cleaning cached files..."
-	- find . -name "__pycache__" -type d -exec rm -rf {} + 2>/dev/null || true
-	- find . -name "*.pyc" -delete 2>/dev/null || true
-	- rm -rf htmlcov .pytest_cache doc/api doc/uml 2>/dev/null || true
-	@echo "Cleanup completed."
-
+	$(SET_PYTHONPATH) $(AND) $(PYTHON) scripts/clean.py	
 
 # ========================= RUN ALL TASKS =====================
 .PHONY: all
-all: install test coverage doc uml lint
+all: install clean test coverage doc uml lint 
 	@echo "All tasks completed successfully!"
