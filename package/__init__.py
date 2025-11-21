@@ -1,3 +1,5 @@
+"""__init__.py class."""
+
 from .dice import Dice
 from .game import Game
 from .highscore import HighScore

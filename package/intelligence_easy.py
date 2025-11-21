@@ -15,10 +15,12 @@ class Easy(Intelligence):
 
     The Easy intelligence makes decisions based on the following premises:
 
-    it will roll the dice until the turn score reaches 10, then it will choose to hold.
+    it will roll the dice until the turn score reaches 10, then it will choose
+    to hold.
     """
 
     def decide(self, turn_score, total_score, opponent_score):
+        """Decide to roll or hold."""
         if turn_score < 10:
             return "roll"
         else:

@@ -1,10 +1,10 @@
+"""The main game module for the Pig Game command-line application."""
+
 import cmd
 import pickle
 import time
 from functools import wraps
-
 from InquirerPy import inquirer
-
 from .dice import Dice
 from .highscore import HighScore
 from .histogram import Histogram
@@ -16,6 +16,8 @@ from .utils import Utils
 
 
 class Game(cmd.Cmd):
+    """Command-line interface and controller for the Pig Game."""
+
     intro = """
     ╔═══════════════════════════════════════╗
     ║         Welcome to PIG GAME!          ║
@@ -25,8 +27,8 @@ class Game(cmd.Cmd):
     - Race to 100 points to win
     - Roll dice to accumulate points in your turn
     - If you roll a 1, you lose all turn points and your turn ends.
-      If you roll double 1s (in two-dice game), you lose all accumulated points for the game
-      and your turn ends
+      If you roll double 1s (in two-dice game), you lose all accumulated
+      points for the game and your turn ends
 
     Actions:
     - Type 'start' to start a game
@@ -44,6 +46,7 @@ class Game(cmd.Cmd):
     prompt = "piggame> "
 
     def __init__(self, is_new_game=False):
+        """Initialize the values."""
         super().__init__()
         self.is_new_game = is_new_game
         self.player_one = None
@@ -70,9 +73,12 @@ class Game(cmd.Cmd):
         return wrapper
 
     def check_is_game_paused(func):
-        """If the game is paused, disable all actions except
-        'exit' and 'unpause' and
-        prompt user to type 'unpause' to unpause the game"""
+        """Check if game is paused.
+
+        If the game is paused, disable all actions except
+        'exit' and 'unpause' and prompt user to type 'unpause'
+        to unpause the game.
+        """
         @wraps(func)
         def wrapper(self, *args):
             if not self.is_game_paused:
@@ -84,6 +90,7 @@ class Game(cmd.Cmd):
 
     def check_is_active_game(func):
         """Check if there is a game in progress.
+
         If a game is in progress,
         the 'start' action will be disabled
         to disallow players from starting a new game
@@ -91,7 +98,8 @@ class Game(cmd.Cmd):
         If there is no game in progress, all actions
         except 'start' and 'again' will be disabled
         since players can't do game play actions
-        while there is no active game"""
+        while there is no active game.
+        """
         @wraps(func)
         def wrapper(self, *args):
             if self.is_game_in_progress:
@@ -102,23 +110,26 @@ class Game(cmd.Cmd):
         return wrapper
 
     def set_is_new_game(self, is_new_game):
-        """Set if this is a new game or restored from the saved game"""
+        """Set if this is a new game or restored from the saved game."""
         self.is_new_game = is_new_game
 
     def preloop(self):
-        """This wil run before the game loop begins,
+        """Preloop.
+
+        This will run before the game loop begins,
         and start the game right away
         if the properties are restored from the saved game.
         If not this will be skipped and players will be asked
         to add game settings such as the number of die,
-        player names etc."""
+        player names etc.
+        """
         if not self.is_new_game:
             self.is_game_paused = False
             self.start_game()
             self.display_score_board()
 
     def choose_number_of_dice(self):
-        """Choose if one or two dice"""
+        """Choose if one or two dice."""
         num_of_dice = inquirer.select(
             message="How many dice?", choices=["1", "2"]
         ).execute()
@@ -127,7 +138,7 @@ class Game(cmd.Cmd):
         return 2
 
     def choose_robot_or_human(self):
-        """Player chooses if they want to play with a robot or a human"""
+        """Choose if they want to play with a robot or a human."""
         action = inquirer.select(
             message="Play with?", choices=["🦾 a robot", "💪 a human"]
         ).execute()
@@ -146,7 +157,7 @@ class Game(cmd.Cmd):
         self.start_game()
 
     def choose_intelligence_level(self):
-        """Choose the IQ of the robot"""
+        """Choose the IQ of the robot."""
         intel = inquirer.select(
             message="How smart do you want your robot friend to be?",
             choices=["Low", "Medium", "High"],
@@ -161,16 +172,16 @@ class Game(cmd.Cmd):
 
     @check_is_new_game
     def do_start(self, arg):
+        """Start the game."""
         if self.is_game_in_progress:
             print("Can't start a game while there is one in progress")
             return
         self.is_game_in_progress = True
-        """Start the game"""
         self.number_of_dice = self.choose_number_of_dice()
         self.choose_robot_or_human()
 
     def start_game(self):
-        """Game starts or resumes"""
+        """Start game or resume."""
         print("Game started")
         self.is_game_paused = False
         self.current_player = self.player_one
@@ -180,8 +191,8 @@ class Game(cmd.Cmd):
     @check_is_active_game
     @check_is_game_paused
     def do_play(self, arg):
+        """Play. You will be asked to choose to roll or hold."""
         turn_score = 0
-        """Play. You will be asked to choose to roll or hold"""
         points = self.current_player.get_score()
 
         print(
@@ -227,11 +238,11 @@ class Game(cmd.Cmd):
 
     @check_is_game_paused
     def auto_play(self):
-        """Robot plays"""
+        """Robot plays."""
         points = self.player_two.get_score()
         turn_score = 0
         print(f"Robot's total points: {points}, Round total: {turn_score}")
-        """opponent's score is set to 0 for now as it is not used"""
+        """Opponent's score is set to 0 for now as it is not used."""
         action = self.intelligence.decide(turn_score, points, 0)
         is_winner_found = False
         while action != "hold":
@@ -265,7 +276,7 @@ class Game(cmd.Cmd):
             self.pass_to_human()
 
     def choose_roll_or_hold(self):
-        """Human chooses to roll the dice or hold"""
+        """Choose to roll the dice or hold."""
         choice = inquirer.select(
             message="Roll or hold", choices=["Roll", "Hold"]
         ).execute()
@@ -274,7 +285,7 @@ class Game(cmd.Cmd):
         return "Hold"
 
     def roll(self):
-        """Roll the dice once or twice depending on how many dice there are"""
+        """Roll the dice once or twice depending on how many dice there are."""
         result_list = []
         result = 0
         print("Dice: ", end="")
@@ -288,13 +299,16 @@ class Game(cmd.Cmd):
         return result, result_list
 
     def count_ones(self, faces):
-        """Count the number of ones in the list "faces"""
+        """Count the number of ones in the list "faces."""
         count = faces.count(1)
         return count
 
     def print_rolled_one_outcome(self, num_of_ones):
-        """Check how many ones have been rolled this round to decide if the player had lost
-        points from this round, points from this game, or no points at all"""
+        """Check how many ones have been rolled this round.
+
+        To decide if the player had lost points from this round, points
+        from this game, or no points at all.
+        """
         if num_of_ones == 1:
             print("Rolled a single one and lost all the points from this turn.")
         if num_of_ones == 2:
@@ -302,8 +316,10 @@ class Game(cmd.Cmd):
         print("TURN ENDS.\n")
 
     def switch_current_player(self):
-        """Set current player to the other player when current player's turn ends.
-        Change name in prompt"""
+        """Set current player to other player when current players turn ends.
+
+        Change name in prompt.
+        """
         if self.player_one is self.current_player:
             self.current_player = self.player_two
         else:
@@ -311,16 +327,19 @@ class Game(cmd.Cmd):
         Game.prompt = self.current_player.get_name() + "> "
 
     def pass_to_human(self):
-        """Change current player to human. Change name in prompt"""
+        """Change current player to human. Change name in prompt."""
         self.current_player = self.player_one
         Game.prompt = self.player_one.get_name() + "> "
 
     def run_winner_found_sequence(self, winner):
-        """Set that there is no active game;
+        """Announce the winner.
+
+        Set that there is no active game;
         Announce winner;
         Announce that game ended;
         save the game to json file;
-        reset player points to zero"""
+        reset player points to zero.
+        """
         print()
         self.is_game_in_progress = False
         self.announce_winner(winner)
@@ -329,7 +348,7 @@ class Game(cmd.Cmd):
         self.reset_player_scores()
 
     def reset_player_scores(self):
-        """Reset players scores"""
+        """Reset players scores."""
         self.player_two.set_score(0)
         self.player_one.set_score(0)
 
@@ -348,22 +367,24 @@ class Game(cmd.Cmd):
         Utils.print_dict_table(info, banner)
 
     def announce_winner(self, player):
+        """Announce the winner."""
         print(f"{player.get_name()} has won. Congrats🎉")
 
     def announce_game_end(self):
+        """Announce the end of game."""
         print("\nGAME OVER!. Type 'start' to play another game")
         Game.prompt = "piggygame> "
 
     @check_is_active_game
     @check_is_game_paused
     def do_cheat(self, arg):
-        """Cheat to win"""
+        """Cheat to win."""
         self.current_player.set_score(100)
         self.run_winner_found_sequence(self.current_player)
 
     @check_is_active_game
     def do_pause(self, arg):
-        """Save game data to file and pause the game"""
+        """Save game data to file and pause the game."""
         # self.save_game()
         self.is_game_paused = True
         print("Game paused. Type 'unpause' to resume game\n")
@@ -376,7 +397,7 @@ class Game(cmd.Cmd):
 
     @check_is_active_game
     def do_unpause(self, arg):
-        """Unpause the game"""
+        """Unpause the game."""
         self.is_game_paused = False
         self.display_score_board()
         Game.prompt = self.current_player.name + "> "
@@ -384,7 +405,7 @@ class Game(cmd.Cmd):
     @check_is_active_game
     @check_is_game_paused
     def do_changename(self, arg):
-        """Change your username"""
+        """Change your username."""
         old_name = self.current_player.get_name()
         new_name = input("Enter your new name: ")
         self.current_player.change_name(new_name)
@@ -395,7 +416,7 @@ class Game(cmd.Cmd):
         Game.prompt = self.current_player.get_name() + "> "
 
     def do_show(self, arg):
-        """Show statistics"""
+        """Show statistics."""
         choice = inquirer.select(
             message="What would you like to see?",
             choices=["Leaderboard", "Player names"],
@@ -407,7 +428,7 @@ class Game(cmd.Cmd):
             stats.display_games_played()
 
     def do_exit(self, arg):
-        """Exit the game"""
+        """Exit the game."""
         choice = inquirer.select(
             message="Save the game to resume later?",
             choices=["✔️ Yes", "❌No"],
@@ -423,20 +444,26 @@ class Game(cmd.Cmd):
         return True
 
     def __getstate__(self):
-        """Added this to solve "can't pickle
-        TextIOwrapper" error when pickling"""
-        """Copy instance dictionary"""
+        """Fix error.
+
+        Added this to solve "can't pickle
+        TextIOwrapper" error when pickling.
+        """
+        """Copy instance dictionary."""
         state = self.__dict__.copy()
 
-        """Remove unpickleable cmd.Cmd attributes"""
+        """Remove unpickleable cmd.Cmd attributes."""
         for key in ("stdin", "stdout", "stderr"):
             if key in state:
                 del state[key]
         return state
 
     def __setstate__(self, state):
-        """Added this to solve "can't pickle
-        TextIOwrapper" error when pickling"""
+        """Fix error.
+
+        Added this to solve "can't pickle
+        TextIOwrapper" error when pickling.
+        """
         self.__dict__.update(state)
         import sys
 
@@ -444,8 +471,8 @@ class Game(cmd.Cmd):
         self.stdout = sys.stdout
 
     def postloop(self):
+        """Pickle the whole game object."""
         if self.save_game:
-            """Pickle the whole game object"""
             with open("game_state.pkl", "wb") as f:
                 pickle.dump(self, f)
                 print("Game saved. Good bye!")

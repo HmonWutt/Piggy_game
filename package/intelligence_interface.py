@@ -1,3 +1,5 @@
+"""Interface for the intelligence class."""
+
 from abc import ABC, abstractmethod
 
 

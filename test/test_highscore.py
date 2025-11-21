@@ -1,13 +1,14 @@
+"""The test for highscore class."""
+
 import os
 import shutil
 import unittest
 from functools import wraps
-
 from package import HighScore, Player, Utils
 
 
 def print_test_result(test_func):
-    """Decorator that print test result"""
+    """Decorate the print test result."""
     @wraps(test_func)
     def wrapper(*args):
         try:
@@ -24,8 +25,10 @@ def print_test_result(test_func):
 
 
 class TestHighscore(unittest.TestCase):
+    """Test suite for highscore class."""
+
     def setUp(self):
-        """Set up. Runs before each test"""
+        """Set up. Runs before each test."""
         self.highscore = HighScore()
         self.file_content = {"content": "dummy_content"}
         self.file_path = os.path.abspath(
@@ -37,7 +40,7 @@ class TestHighscore(unittest.TestCase):
 
     @print_test_result
     def test_load_data_no_existing_file(self):
-        """Test loading data when no file exists"""
+        """Test loading data when no file exists."""
         self.assertTrue(
             os.path.exists(self.file_path),
             "Expected data/highscores.json to exist but it doesn't",
@@ -45,7 +48,7 @@ class TestHighscore(unittest.TestCase):
 
     @print_test_result
     def test_load_data_with_existing_file(self):
-        """Test loading data when a file exists"""
+        """Test loading data when a file exists."""
         Utils.write_to_file(self.file_path, self.file_content)
         retrieved = Utils.read_from_file(self.file_path)
         self.highscore.load_data()
@@ -55,7 +58,7 @@ class TestHighscore(unittest.TestCase):
     #
     @print_test_result
     def test_save_data(self):
-        """Test saving an object to data"""
+        """Test saving an object to data."""
         content = {"Greeting": {"Hello": "World"}}
         self.highscore.data = content
         self.highscore.save_data()
@@ -63,7 +66,7 @@ class TestHighscore(unittest.TestCase):
 
     @print_test_result
     def test_get_player_stats(self):
-        """Get stats of one player"""
+        """Get stats of one player."""
         self.highscore.data = {"Players": {"player_one": 45, "player_two": 89}}
         result = self.highscore.get_player_stats("player_one")
         self.assertEqual(
@@ -74,7 +77,7 @@ class TestHighscore(unittest.TestCase):
 
     @print_test_result
     def test_get_all_players(self):
-        """Get stats of all players"""
+        """Get stats of all players."""
         self.highscore.data = {
             "Players": {
                 "player_one": 100,
@@ -88,7 +91,7 @@ class TestHighscore(unittest.TestCase):
 
     @print_test_result
     def test_add_player(self):
-        """Test adding a player"""
+        """Test adding a player."""
         dict = {
             "Players": {
                 "John": {
@@ -103,7 +106,7 @@ class TestHighscore(unittest.TestCase):
 
     @print_test_result
     def test_record_game_win(self):
-        """Test adding a new game result"""
+        """Test adding a new game result."""
         old_record = {
             "Players": {
                 "Jan": {
@@ -126,7 +129,7 @@ class TestHighscore(unittest.TestCase):
         self.assertEqual(self.highscore.data, old_record)
 
     def tearDown(self):
-        """Tear down. Runs after each test"""
+        """Tear down. Runs after each test."""
         if os.path.isdir(os.path.dirname(self.file_path)):
             shutil.rmtree(os.path.dirname(self.file_path))
 

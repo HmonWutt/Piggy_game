@@ -1,3 +1,5 @@
+"""The test for the player class."""
+
 from package import Player
 
 
@@ -5,7 +7,7 @@ class TestPlayer:
     """Test suite for Player class."""
 
     def setup_method(self):
-        """Sets up an instance before test."""
+        """Set up an instance before test."""
         self.player = Player("Alice")
 
     def test_constructor_name(self):
