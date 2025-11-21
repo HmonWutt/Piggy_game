@@ -88,18 +88,18 @@
 
 ### 2. Auto-generated Documentation
 
-- [ ] Tool chosen (e.g., Sphinx, pdoc, pydoc)
-- [ ] HTML documentation generated and stored in `doc/api`
-- [ ] Make target `make doc` works
-- [ ] README includes instructions to regenerate docs
+- [x] Tool chosen (e.g., Sphinx, pdoc, pydoc)
+- [x] HTML documentation generated and stored in `doc/api`
+- [x] Make target `make doc` works
+- [x] README includes instructions to regenerate docs
 
 ### 3. UML Diagrams
 
-- [ ] Tool chosen (e.g., pyreverse, )
-- [ ] Generated **class diagram** and **package diagram**
-- [ ] Stored under `doc/uml`
-- [ ] Make target `make uml` works
-- [ ] README includes instructions to regenerate UML diagrams
+- [x] Tool chosen (e.g., pyreverse, )
+- [x] Generated **class diagram** and **package diagram**
+- [x] Stored under `doc/uml`
+- [x] Make target `make uml` works
+- [x] README includes instructions to regenerate UML diagrams
 
 ---
 
