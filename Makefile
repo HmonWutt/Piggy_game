@@ -27,8 +27,8 @@ endif
 venv:
 	@echo "Creating virtual environment..."
 ifeq ($(OS),Windows_NT)
-	@if not exist $(VENV_DIR) (
-		python -m venv $(VENV_DIR)
+	@if not exist "$(VENV_DIR)" (
+		python3.12 -m venv $(VENV_DIR)
 	) else (
 		echo "Virtual environment already exists."
 	)
@@ -38,7 +38,7 @@ ifeq ($(OS),Windows_NT)
 	@echo "    $(VENV_DIR)\\Scripts\\Activate.ps1"
 else
 	@if [ ! -d "$(VENV_DIR)" ]; then \
-		python3 -m venv $(VENV_DIR); \
+		python3.12 -m venv $(VENV_DIR); \
 	else \
 		echo "Virtual environment already exists."; \
 	fi
