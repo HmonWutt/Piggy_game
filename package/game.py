@@ -220,13 +220,8 @@ class Game(cmd.Cmd):
                 break
             # fmt: off
             print(
-<<<<<<< HEAD
-                f"Total points: {points + turn_score}, Round total: {turn_score}"
-            )  # noqa
-=======
-                f"Total points: {points + turn_score}, Round total: {turn_score}")
+                f"Total points: {points + turn_score}, Round total: {turn_score}")  # noqa
             # fmt: on
->>>>>>> tmp
             if points + turn_score >= 100:
                 points = 0
                 turn_score = 0
@@ -273,21 +268,16 @@ class Game(cmd.Cmd):
                 self.run_winner_found_sequence(self.player_two)
                 is_winner_found = True
                 break
-<<<<<<< HEAD
-            print(
-                f"Total points: {points + turn_score}, Round total: {turn_score}.\n"
-            )  # noqa
-=======
+
             # fmt: off
             print(f"Total points: {points + turn_score}, Round total: {turn_score}.\n")
             # fmt : on
->>>>>>> tmp
             action = self.intelligence.decide(turn_score, points, 0)
-        if action == "hold":
-            print(f"Robots action: {action}\n")
-        self.player_two.set_score(turn_score + points)
-        if not is_winner_found:
-            self.pass_to_human()
+            if action == "hold":
+                print(f"Robots action: {action}\n")
+                self.player_two.set_score(turn_score + points)
+            if not is_winner_found:
+                self.pass_to_human()
 
     def choose_roll_or_hold(self):
         """Choose to roll the dice or hold."""
